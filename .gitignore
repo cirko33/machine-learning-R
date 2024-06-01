@@ -1,0 +1,4 @@
+spark/
+logs/
+spark-warehouse/
+data/
