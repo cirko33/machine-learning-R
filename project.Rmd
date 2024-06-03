@@ -131,7 +131,7 @@ vendorIdCounts <- data %>%
 kable(vendorIdCounts)
 ```
 
-```{r Vizuelizacija atributa VendorID, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija atributa VendorID, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 vds <- pull(data, VendorID)
 png("images/vendorIdCounts.png", width = 800, height = 1200)
 pi <- pie(table(vds), main = "Broj vožnji po VendorID-u", labels = c("VendorID 1", "VendorID 2"))
@@ -148,7 +148,7 @@ passengerCountCounts <- data %>%
 
 kable(passengerCountCounts)
 ```
-```{r Vizuelizacija atributa passenger_count, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija atributa passenger_count, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 passengerCounts <- pull(data, passenger_count)
 
 png("images/passengerCountHistogram.png", width = 800, height = 1200)
@@ -172,7 +172,7 @@ tripDistanceCounts <- data %>%
 
 kable(tripDistanceCounts)
 ```
-```{r Vizuelizacija atributa trip_distance, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija atributa trip_distance, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tripDistances <- pull(data, trip_distance)
 png("images/tripDistanceDensity.png", width = 800, height = 1200)
 plt <- plot(density(tripDistances), main = "Distribucija atributa trip_distance", xlab = "Dužina putovanja", ylab = "Gustina")
@@ -190,7 +190,7 @@ ratecodeIdCounts <- data %>%
 
 kable(ratecodeIdCounts)
 ```
-```{r Vizuelizacija atributa RatecodeID, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija atributa RatecodeID, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 bar <- ggplot(ratecodeIdCounts, aes(x = RatecodeID, y = count, fill = RatecodeID)) +
     geom_bar(stat = "identity") +
     labs(title = "Broj vožnji po RatecodeID-u", x = "RatecodeID", y = "Broj vožnji") +
@@ -211,7 +211,7 @@ paymentTypeCounts <- data %>%
 
 kable(paymentTypeCounts)
 ```
-```{r Vizuelizacija atributa payment_type, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija atributa payment_type, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 bar <- ggplot(paymentTypeCounts, aes(x = payment_type, y = count, fill = payment_type)) +
     geom_bar(stat = "identity") +
     labs(title = "Broj vožnji po payment_type-u", x = "payment_type", y = "Broj vožnji") +
@@ -231,7 +231,7 @@ fareAmountCounts <- data %>%
 
 kable(fareAmountCounts)
 ```
-```{r Vizuelizacija atributa fare_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija atributa fare_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 fareAmounts <- pull(data, fare_amount)
 png("images/fareAmountDensity.png", width = 800, height = 1200)
 
@@ -251,7 +251,7 @@ extraCounts <- data %>%
 
 kable(extraCounts)
 ```
-```{r Vizuelizacija atributa extra, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija atributa extra, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 extraValues <- pull(data, extra)
 bar <- ggplot(extraCounts, aes(x = extra, y = count, fill = extra)) +
     geom_bar(stat = "identity", width = 0.4) +
@@ -273,7 +273,7 @@ mtaTaxCounts <- data %>%
 
 kable(mtaTaxCounts)
 ```
-```{r Vizuelizacija atributa mta_tax, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija atributa mta_tax, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 mtaTaxValues <- pull(data, mta_tax)
 bar <- ggplot(mtaTaxCounts, aes(x = mta_tax, y = count, fill = mta_tax)) +
     geom_bar(stat = "identity", width = 0.4) +
@@ -294,7 +294,7 @@ tipAmountCounts <- data %>%
 
 kable(tipAmountCounts)
 ```
-```{r Vizuelizacija atributa tip_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija atributa tip_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tipAmounts <- pull(data, tip_amount)
 png("images/tipAmountDensity.png", width = 800, height = 1200)
 plt <- plot(density(tipAmounts), main = "Distribucija atributa tip_amount", xlab = "Napojnica", ylab = "Gustina", xlim = c(0, 20))
@@ -311,7 +311,7 @@ tollsAmountCounts <- data %>%
 
 kable(tollsAmountCounts)
 ```
-```{r Vizuelizacija atributa tolls_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija atributa tolls_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tollsAmounts <- pull(data, tolls_amount)
 png("images/tollsAmountDensity.png", width = 800, height = 1200)
 plt <- plot(density(tollsAmounts), main = "Distribucija atributa tolls_amount", xlab = "Troškovi putarine", ylab = "Gustina",  xlim = c(0, 20))
@@ -327,7 +327,7 @@ improvementSurchargeCounts <- data %>%
 
 kable(improvementSurchargeCounts)
 ```
-```{r Vizuelizacija atributa improvement_surcharge, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija atributa improvement_surcharge, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 improvementSurcharge <- pull(data, improvement_surcharge)
 png("images/improvementSurchargeDensity.png", width = 800, height = 1200)
 plt <- plot(density(improvementSurcharge), main = "Distribucija atributa improvement_surcharge", xlab = "Troškovi poboljšanja", ylab = "Gustina", xlim = c(0, 0.4))
@@ -343,7 +343,7 @@ totalAmountCounts <- data %>%
 
 kable(totalAmountCounts)
 ```
-```{r Vizuelizacija atributa total_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija atributa total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 totalAmount <- pull(data, total_amount)
 png("images/totalAmountDensity.png", width = 800, height = 1200)
 plt <- plot(density(totalAmount), main = "Distribucija atributa total_amount", xlab = "Ukupna cena", ylab = "Gustina", xlim = c(0, 300))
@@ -360,7 +360,7 @@ payedWithCardCounts <- data %>%
 
 kable(payedWithCardCounts)
 ```
-```{r Vizuelizacija atributa payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija atributa payed_with_card, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 py <- pull(data, payed_with_card)
 png("images/payedWithCardCounts.png", width = 800, height = 1200)
 pi <- pie(table(py), main = "Broj vožnji po načinu plaćanja", labels = c("Plaćeno karticom", "Nije plaćeno karticom"))
@@ -374,11 +374,12 @@ dev.off()
 vendorIdPassengerCount <- data %>%
     group_by(VendorID, passenger_count) %>%
     summarise(count = n()) %>%
-    collect() %>% arrange(VendorID, passenger_count)
+    arrange(VendorID, passenger_count) %>%
+    collect() 
 
 kable(vendorIdPassengerCount)
 ```
-```{r Vizuelizacija zavisnosti atributa VendorID i passenger_count, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa VendorID i passenger_count, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 vxp <- data %>%
     select(VendorID, passenger_count) %>%
     collect()
@@ -394,11 +395,12 @@ dev.off()
 vendorIdTripDistance <- data %>%
     group_by(VendorID) %>%
     summarise(min = min(trip_distance), max = max(trip_distance), avg = mean(trip_distance), median = median(trip_distance)) %>%
+    arrange(VendorID) %>%
     collect()
 
 kable(vendorIdTripDistance)
 ```
-```{r Vizuelizacija zavisnosti atributa VendorID i trip_distance, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa VendorID i trip_distance, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 vtd <- data %>%
     select(VendorID, trip_distance) %>%
     collect()
@@ -414,11 +416,12 @@ dev.off()
 vendorIdRatecodeId <- data %>%
     group_by(VendorID, RatecodeID) %>%
     summarise(count = n()) %>%
-    collect() %>% arrange(VendorID, RatecodeID)
+    arrange(VendorID, RatecodeID) %>%
+    collect()
 
 kable(vendorIdRatecodeId)
 ```
-```{r Vizuelizacija zavisnosti atributa VendorID i RatecodeID, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa VendorID i RatecodeID, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 vri <- data %>%
     select(VendorID, RatecodeID) %>%
     collect()
@@ -439,7 +442,7 @@ vendorIdPaymentType <- data %>%
 
 kable(vendorIdPaymentType)
 ```
-```{r Vizuelizacija zavisnosti atributa VendorID i payment_type, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa VendorID i payment_type, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 vpt <- data %>%
     select(VendorID, payment_type) %>%
     collect()
@@ -459,7 +462,7 @@ vendorIdFareAmount <- data %>%
 
 kable(vendorIdFareAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa VendorID i fare_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa VendorID i fare_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 vfa <- data %>%
     select(VendorID, fare_amount) %>%
     collect()
@@ -479,7 +482,7 @@ vendorIdExtra <- data %>%
 
 kable(vendorIdExtra)
 ```
-```{r Vizuelizacija zavisnosti atributa VendorID i extra, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa VendorID i extra, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 vex <- data %>%
     select(VendorID, extra) %>%
     collect()
@@ -501,7 +504,7 @@ vendorIdMtaTax <- data %>%
 
 kable(vendorIdMtaTax)
 ```
-```{r Vizuelizacija zavisnosti atributa VendorID i mta_tax, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa VendorID i mta_tax, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 vmt <- data %>%
     select(VendorID, mta_tax) %>%
     collect()
@@ -521,7 +524,7 @@ vendorIdTipAmount <- data %>%
 
 kable(vendorIdTipAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa VendorID i tip_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa VendorID i tip_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 vta <- data %>%
     select(VendorID, tip_amount) %>%
     collect()
@@ -541,7 +544,7 @@ vendorIdTollsAmount <- data %>%
 
 kable(vendorIdTollsAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa VendorID i tolls_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa VendorID i tolls_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 vta <- data %>%
     select(VendorID, tolls_amount) %>%
     collect()
@@ -559,7 +562,7 @@ vendorIdImprovementSurcharge <- data %>%
      summarise(count = n()) %>%
     collect()
 ```
-```{r Vizuelizacija zavisnosti atributa VendorID i improvement_surcharge, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa VendorID i improvement_surcharge, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 vis <- data %>%
     select(VendorID, improvement_surcharge) %>%
     collect()
@@ -579,7 +582,7 @@ vendorIdTotalAmount <- data %>%
 
 kable(vendorIdTotalAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa VendorID i total_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa VendorID i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 vta <- data %>%
     select(VendorID, total_amount) %>%
     collect()
@@ -599,7 +602,7 @@ vendorIdPayedWithCard <- data %>%
 
 kable(vendorIdPayedWithCard)
 ```
-```{r Vizuelizacija zavisnosti atributa VendorID i payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa VendorID i payed_with_card, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 vpc <- data %>%
     select(VendorID, payed_with_card) %>%
     collect()
@@ -619,7 +622,7 @@ passengerCountTripDistance <- data %>%
 
 kable(passengerCountTripDistance)
 ```
-```{r Vizuelizacija zavisnosti atributa passenger_count i trip_distance, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa passenger_count i trip_distance, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 ptd <- data %>%
     select(passenger_count, trip_distance) %>%
     collect()
@@ -639,7 +642,7 @@ passengerCountRatecodeId <- data %>%
 
 kable(passengerCountRatecodeId)
 ```
-```{r Vizuelizacija zavisnosti atributa passenger_count i RatecodeID, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa passenger_count i RatecodeID, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pr <- data %>%
     select(passenger_count, RatecodeID) %>%
     collect()
@@ -658,7 +661,7 @@ passengerCountPaymentType <- data %>%
 
 kable(passengerCountPaymentType)
 ```
-```{r Vizuelizacija zavisnosti atributa passenger_count i payment_type, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa passenger_count i payment_type, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 ppt <- data %>%
     select(passenger_count, payment_type) %>%
     collect()
@@ -678,7 +681,7 @@ passengerCountFareAmount <- data %>%
 
 kable(passengerCountFareAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa passenger_count i fare_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa passenger_count i fare_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pfa <- data %>%
     select(passenger_count, fare_amount) %>%
     collect()
@@ -698,7 +701,7 @@ passengerCountExtra <- data %>%
 
 kable(passengerCountExtra)
 ```
-```{r Vizuelizacija zavisnosti atributa passenger_count i extra, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa passenger_count i extra, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pex <- data %>%
     select(passenger_count, extra) %>%
     collect()
@@ -718,7 +721,7 @@ passengerCountMtaTax <- data %>%
 
 kable(passengerCountMtaTax)
 ```
-```{r Vizuelizacija zavisnosti atributa passenger_count i mta_tax, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa passenger_count i mta_tax, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pmt <- data %>%
     select(passenger_count, mta_tax) %>%
     collect()
@@ -738,7 +741,7 @@ passengerCountTipAmount <- data %>%
     
 kable(passengerCountTipAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa passenger_count i tip_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa passenger_count i tip_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pta <- data %>%
     select(passenger_count, tip_amount) %>%
     collect()
@@ -758,7 +761,7 @@ passengerCountTollsAmount <- data %>%
 
 kable(passengerCountTollsAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa passenger_count i tolls_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa passenger_count i tolls_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pta <- data %>%
     select(passenger_count, tolls_amount) %>%
     collect()
@@ -778,7 +781,7 @@ passengerCountImprovementSurcharge <- data %>%
     
 kable(passengerCountImprovementSurcharge)
 ```
-```{r Vizuelizacija zavisnosti atributa passenger_count i improvement_surcharge, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa passenger_count i improvement_surcharge, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pis <- data %>%
     select(passenger_count, improvement_surcharge) %>%
     collect()
@@ -798,7 +801,7 @@ passengerCountTotalAmount <- data %>%
 
 kable(passengerCountTotalAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa passenger_count i total_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa passenger_count i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pta <- data %>%
     select(passenger_count, total_amount) %>%
     collect()
@@ -818,7 +821,7 @@ passengerCountPayedWithCard <- data %>%
 
 kable(passengerCountPayedWithCard)
 ```
-```{r Vizuelizacija zavisnosti atributa passenger_count i payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa passenger_count i payed_with_card, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 ppc <- data %>%
     select(passenger_count, payed_with_card) %>%
     collect()
@@ -838,7 +841,7 @@ tripDistanceRatecodeId <- data %>%
 
 kable(tripDistanceRatecodeId)
 ```
-```{r Vizuelizacija zavisnosti atributa trip_distance i RatecodeID, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa trip_distance i RatecodeID, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tr <- data %>%
     select(trip_distance, RatecodeID) %>%
     collect()
@@ -856,7 +859,7 @@ tripDistancePaymentType <- data %>%
     summarise(min = min(trip_distance), max = max(trip_distance), avg = mean(trip_distance), median = median(trip_distance)) %>%
     collect()
 ```
-```{r Vizuelizacija zavisnosti atributa trip_distance i payment_type, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa trip_distance i payment_type, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tp <- data %>%
     select(trip_distance, payment_type) %>%
     collect()
@@ -867,7 +870,7 @@ dev.off()
 ```
 
 ### Analiza zavisnosti atributa trip_distance i fare_amount
-```{r Vizuelizacija zavisnosti atributa trip_distance i fare_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa trip_distance i fare_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tfa <- data %>%
     select(trip_distance, fare_amount) %>%
     collect()
@@ -887,7 +890,7 @@ tripDistanceExtra <- data %>%
 
 kable(tripDistanceExtra)
 ```
-```{r Vizuelizacija zavisnosti atributa trip_distance i extra, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa trip_distance i extra, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 te <- data %>%
     select(trip_distance, extra) %>%
     collect()
@@ -907,7 +910,7 @@ tripDistanceMtaTax <- data %>%
 
 kable(tripDistanceMtaTax)
 ```
-```{r Vizuelizacija zavisnosti atributa trip_distance i mta_tax, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa trip_distance i mta_tax, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tmt <- data %>%
     select(trip_distance, mta_tax) %>%
     collect()
@@ -919,7 +922,7 @@ dev.off()
 ![Dužina putovanja po mta_tax](images/tripDistanceMtaTax.png)
 
 ### Analiza zavisnosti atributa trip_distance i tip_amount
-```{r Vizuelizacija zavisnosti atributa trip_distance i tip_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa trip_distance i tip_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tta <- data %>%
     select(trip_distance, tip_amount) %>%
     collect()
@@ -931,7 +934,7 @@ dev.off()
 ![Dužina putovanja po napojnici](images/tripDistanceTipAmount.png)
 
 ### Analiza zavisnosti atributa trip_distance i tolls_amount
-```{r Vizuelizacija zavisnosti atributa trip_distance i tolls_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa trip_distance i tolls_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tta <- data %>%
     select(trip_distance, tolls_amount) %>%
     collect()
@@ -951,7 +954,7 @@ tripDistanceImprovementSurcharge <- data %>%
 
 kable(tripDistanceImprovementSurcharge)
 ```
-```{r Vizuelizacija zavisnosti atributa trip_distance i improvement_surcharge, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa trip_distance i improvement_surcharge, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tis <- data %>%
     select(trip_distance, improvement_surcharge) %>%
     collect()
@@ -963,7 +966,7 @@ dev.off()
 ![Dužina putovanja po improvement_surcharge](images/tripDistanceImprovementSurcharge.png)
 
 ### Analiza zavisnosti atributa trip_distance i total_amount
-```{r Vizuelizacija zavisnosti atributa trip_distance i total_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa trip_distance i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tta <- data %>%
     select(trip_distance, total_amount) %>%
     collect()
@@ -983,7 +986,7 @@ tripDistancePayedWithCard <- data %>%
 
 kable(tripDistancePayedWithCard)
 ```
-```{r Vizuelizacija zavisnosti atributa trip_distance i payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa trip_distance i payed_with_card, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tpc <- data %>%
     select(trip_distance, payed_with_card) %>%
     collect()
@@ -1003,7 +1006,7 @@ ratecodeIdPaymentType <- data %>%
 
 kable(ratecodeIdPaymentType)
 ```
-```{r Vizuelizacija zavisnosti atributa RatecodeID i payment_type, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa RatecodeID i payment_type, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 rpt <- data %>%
     select(RatecodeID, payment_type) %>%
     collect()
@@ -1023,7 +1026,7 @@ ratecodeIdFareAmount <- data %>%
 
 kable(ratecodeIdFareAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa RatecodeID i fare_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa RatecodeID i fare_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 rfa <- data %>%
     select(RatecodeID, fare_amount) %>%
     collect()
@@ -1043,7 +1046,7 @@ ratecodeIdExtra <- data %>%
 
 kable(ratecodeIdExtra)
 ```
-```{r Vizuelizacija zavisnosti atributa RatecodeID i extra, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa RatecodeID i extra, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 rex <- data %>%
     select(RatecodeID, extra) %>%
     collect()
@@ -1063,7 +1066,7 @@ ratecodeIdMtaTax <- data %>%
 
 kable(ratecodeIdMtaTax)
 ```
-```{r Vizuelizacija zavisnosti atributa RatecodeID i mta_tax, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa RatecodeID i mta_tax, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 rmt <- data %>%
     select(RatecodeID, mta_tax) %>%
     collect()
@@ -1083,7 +1086,7 @@ ratecodeIdTipAmount <- data %>%
 
 kable(ratecodeIdTipAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa RatecodeID i tip_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa RatecodeID i tip_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 rta <- data %>%
     select(RatecodeID, tip_amount) %>%
     collect()
@@ -1103,7 +1106,7 @@ ratecodeIdTollsAmount <- data %>%
 
 kable(ratecodeIdTollsAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa RatecodeID i tolls_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa RatecodeID i tolls_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 rta <- data %>%
     select(RatecodeID, tolls_amount) %>%
     collect()
@@ -1123,7 +1126,7 @@ ratecodeIdImprovementSurcharge <- data %>%
 
 kable(ratecodeIdImprovementSurcharge)
 ```
-```{r Vizuelizacija zavisnosti atributa RatecodeID i improvement_surcharge, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa RatecodeID i improvement_surcharge, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 ris <- data %>%
     select(RatecodeID, improvement_surcharge) %>%
     collect()
@@ -1143,7 +1146,7 @@ ratecodeIdTotalAmount <- data %>%
 
 kable(ratecodeIdTotalAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa RatecodeID i total_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa RatecodeID i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 rta <- data %>%
     select(RatecodeID, total_amount) %>%
     collect()
@@ -1163,7 +1166,7 @@ ratecodeIdPayedWithCard <- data %>%
 
 kable(ratecodeIdPayedWithCard)
 ```
-```{r Vizuelizacija zavisnosti atributa RatecodeID i payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa RatecodeID i payed_with_card, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 rpc <- data %>%
     select(RatecodeID, payed_with_card) %>%
     collect()
@@ -1183,7 +1186,7 @@ paymentTypeFareAmount <- data %>%
 
 kable(paymentTypeFareAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa payment_type i fare_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa payment_type i fare_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pfa <- data %>%
     select(payment_type, fare_amount) %>%
     collect()
@@ -1203,7 +1206,7 @@ paymentTypeExtra <- data %>%
 
 kable(paymentTypeExtra)
 ```
-```{r Vizuelizacija zavisnosti atributa payment_type i extra, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa payment_type i extra, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pex <- data %>%
     select(payment_type, extra) %>%
     collect()
@@ -1223,7 +1226,7 @@ paymentTypeMtaTax <- data %>%
 
 kable(paymentTypeMtaTax)
 ```
-```{r Vizuelizacija zavisnosti atributa payment_type i mta_tax, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa payment_type i mta_tax, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pmt <- data %>%
     select(payment_type, mta_tax) %>%
     collect()
@@ -1243,7 +1246,7 @@ paymentTypeTipAmount <- data %>%
 
 kable(paymentTypeTipAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa payment_type i tip_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa payment_type i tip_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pta <- data %>%
     select(payment_type, tip_amount) %>%
     collect()
@@ -1262,7 +1265,7 @@ paymentTypeTollsAmount <- data %>%
 
 kable(paymentTypeTollsAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa payment_type i tolls_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa payment_type i tolls_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pta <- data %>%
     select(payment_type, tolls_amount) %>%
     collect()
@@ -1281,7 +1284,7 @@ paymentTypeImprovementSurcharge <- data %>%
 
 kable(paymentTypeImprovementSurcharge)
 ```
-```{r Vizuelizacija zavisnosti atributa payment_type i improvement_surcharge, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa payment_type i improvement_surcharge, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pis <- data %>%
     select(payment_type, improvement_surcharge) %>%
     collect()
@@ -1301,7 +1304,7 @@ paymentTypeTotalAmount <- data %>%
 
 kable(paymentTypeTotalAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa payment_type i total_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa payment_type i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pta <- data %>%
     select(payment_type, total_amount) %>%
     collect()
@@ -1321,7 +1324,7 @@ paymentTypePayedWithCard <- data %>%
 
 kable(paymentTypePayedWithCard)
 ```
-```{r Vizuelizacija zavisnosti atributa payment_type i payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa payment_type i payed_with_card, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 ppc <- data %>%
     select(payment_type, payed_with_card) %>%
     collect()
@@ -1341,7 +1344,7 @@ fareAmountExtra <- data %>%
 
 kable(fareAmountExtra)
 ```
-```{r Vizuelizacija zavisnosti atributa fare_amount i extra, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa fare_amount i extra, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 fae <- data %>%
     select(fare_amount, extra) %>%
     collect()
@@ -1361,7 +1364,7 @@ fareAmountMtaTax <- data %>%
     
 kable(fareAmountMtaTax)
 ```
-```{r Vizuelizacija zavisnosti atributa fare_amount i mta_tax, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa fare_amount i mta_tax, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 fmt <- data %>%
     select(fare_amount, mta_tax) %>%
     collect()
@@ -1373,7 +1376,7 @@ dev.off()
 ![Broj vožnji po ceni vožnje i mta_tax](images/fareAmountMtaTax.png)
 
 ### Analiza zavisnosti atributa fare_amount i tip_amount
-```{r Vizuelizacija zavisnosti atributa fare_amount i tip_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa fare_amount i tip_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 fta <- data %>%
     select(fare_amount, tip_amount) %>%
     collect()
@@ -1385,7 +1388,7 @@ dev.off()
 ![Napojnica po ceni vožnje](images/fareAmountTipAmount.png)
 
 ### Analiza zavisnosti atributa fare_amount i tolls_amount
-```{r Vizuelizacija zavisnosti atributa fare_amount i tolls_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa fare_amount i tolls_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 fta <- data %>%
     select(fare_amount, tolls_amount) %>%
     collect()
@@ -1405,7 +1408,7 @@ fareAmountImprovementSurcharge <- data %>%
 
 kable(fareAmountImprovementSurcharge)
 ```
-```{r Vizuelizacija zavisnosti atributa fare_amount i improvement_surcharge, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa fare_amount i improvement_surcharge, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 fis <- data %>%
     select(fare_amount, improvement_surcharge) %>%
     collect()
@@ -1417,7 +1420,7 @@ dev.off()
 ![Broj vožnji po ceni vožnje i improvement_surcharge](images/fareAmountImprovementSurcharge.png)
 
 ### Analiza zavisnosti atributa fare_amount i total_amount
-```{r Vizuelizacija zavisnosti atributa fare_amount i total_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa fare_amount i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 fta <- data %>%
     select(fare_amount, total_amount) %>%
     collect()
@@ -1437,7 +1440,7 @@ fareAmountPayedWithCard <- data %>%
 
 kable(fareAmountPayedWithCard)
 ```
-```{r Vizuelizacija zavisnosti atributa fare_amount i payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa fare_amount i payed_with_card, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 fpc <- data %>%
     select(fare_amount, payed_with_card) %>%
     collect()
@@ -1457,7 +1460,7 @@ extraMtaTax <- data %>%
 
 kable(extraMtaTax)
 ```
-```{r Vizuelizacija zavisnosti atributa extra i mta_tax, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa extra i mta_tax, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 emt <- data %>%
     select(extra, mta_tax) %>%
     collect()
@@ -1477,7 +1480,7 @@ extraTipAmount <- data %>%
 
 kable(extraTipAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa extra i tip_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa extra i tip_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 eta <- data %>%
     select(extra, tip_amount) %>%
     collect()
@@ -1497,7 +1500,7 @@ extraTollsAmount <- data %>%
 
 kable(extraTollsAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa extra i tolls_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa extra i tolls_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 eta <- data %>%
     select(extra, tolls_amount) %>%
     collect()
@@ -1517,7 +1520,7 @@ extraImprovementSurcharge <- data %>%
 
 kable(extraImprovementSurcharge)
 ```
-```{r Vizuelizacija zavisnosti atributa extra i improvement_surcharge, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa extra i improvement_surcharge, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 eis <- data %>%
     select(extra, improvement_surcharge) %>%
     collect()
@@ -1537,7 +1540,7 @@ extraTotalAmount <- data %>%
 
 kable(extraTotalAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa extra i total_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa extra i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 eta <- data %>%
     select(extra, total_amount) %>%
     collect()
@@ -1557,7 +1560,7 @@ extraPayedWithCard <- data %>%
 
 kable(extraPayedWithCard)
 ```
-```{r Vizuelizacija zavisnosti atributa extra i payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa extra i payed_with_card, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 epc <- data %>%
     select(extra, payed_with_card) %>%
     collect()
@@ -1577,7 +1580,7 @@ mtaTaxTipAmount <- data %>%
 
 kable(mtaTaxTipAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa mta_tax i tip_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa mta_tax i tip_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 mta <- data %>%
     select(mta_tax, tip_amount) %>%
     collect()
@@ -1597,7 +1600,7 @@ mtaTaxTollsAmount <- data %>%
 
 kable(mtaTaxTollsAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa mta_tax i tolls_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa mta_tax i tolls_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 mta <- data %>%
     select(mta_tax, tolls_amount) %>%
     collect()
@@ -1617,7 +1620,7 @@ mtaTaxImprovementSurcharge <- data %>%
 
 kable(mtaTaxImprovementSurcharge)
 ```
-```{r Vizuelizacija zavisnosti atributa mta_tax i improvement_surcharge, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa mta_tax i improvement_surcharge, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 mis <- data %>%
     select(mta_tax, improvement_surcharge) %>%
     collect()
@@ -1637,7 +1640,7 @@ mtaTaxTotalAmount <- data %>%
 
 kable(mtaTaxTotalAmount)
 ```
-```{r Vizuelizacija zavisnosti atributa mta_tax i total_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa mta_tax i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 mta <- data %>%
     select(mta_tax, total_amount) %>%
     collect()
@@ -1657,7 +1660,7 @@ mtaTaxPayedWithCard <- data %>%
 
 kable(mtaTaxPayedWithCard)
 ```
-```{r Vizuelizacija zavisnosti atributa mta_tax i payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa mta_tax i payed_with_card, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 mpc <- data %>%
     select(mta_tax, payed_with_card) %>%
     collect()
@@ -1669,15 +1672,7 @@ dev.off()
 ![Broj vožnji po mta_tax-u i načinu plaćanja](images/mtaTaxPayedWithCard.png)
 
 ### Analiza zavisnosti atributa tip_amount i tolls_amount
-```{r Analiza zavisnosti atributa tip_amount i tolls_amount, message=FALSE, warning=FALSE, error=FALSE}
-tipAmountTollsAmount <- data %>%
-    group_by(tip_amount) %>%
-    summarise(min = min(tolls_amount), max = max(tolls_amount), avg = mean(tolls_amount), median = median(tolls_amount)) %>%
-    collect()
-
-kable(tipAmountTollsAmount)
-```
-```{r Vizuelizacija zavisnosti atributa tip_amount i tolls_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa tip_amount i tolls_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tta <- data %>%
     select(tip_amount, tolls_amount) %>%
     collect()
@@ -1691,13 +1686,13 @@ dev.off()
 ### Analiza zavisnosti atributa tip_amount i improvement_surcharge
 ```{r Analiza zavisnosti atributa tip_amount i improvement_surcharge, message=FALSE, warning=FALSE, error=FALSE}
 tipAmountImprovementSurcharge <- data %>%
-    group_by(tip_amount) %>%
-    summarise(min = min(improvement_surcharge), max = max(improvement_surcharge), avg = mean(improvement_surcharge), median = median(improvement_surcharge)) %>%
+    group_by(improvement_surcharge) %>%
+    summarise(min = min(tip_amount), max = max(tip_amount), avg = mean(tip_amount), median = median(tip_amount)) %>%
     collect()
 
 kable(tipAmountImprovementSurcharge)
 ```
-```{r Vizuelizacija zavisnosti atributa tip_amount i improvement_surcharge, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa tip_amount i improvement_surcharge, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tis <- data %>%
     select(tip_amount, improvement_surcharge) %>%
     collect()
@@ -1709,7 +1704,7 @@ dev.off()
 ![Improvement surcharge po napojnici](images/tipAmountImprovementSurcharge.png)
 
 ### Analiza zavisnosti atributa tip_amount i total_amount
-```{r Vizuelizacija zavisnosti atributa tip_amount i total_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa tip_amount i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tta <- data %>%
     select(tip_amount, total_amount) %>%
     collect()
@@ -1729,7 +1724,7 @@ tipAmountPayedWithCard <- data %>%
 
 kable(tipAmountPayedWithCard)
 ```
-```{r Vizuelizacija zavisnosti atributa tip_amount i payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa tip_amount i payed_with_card, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tpc <- data %>%
     select(tip_amount, payed_with_card) %>%
     collect()
@@ -1743,13 +1738,13 @@ dev.off()
 ### Analiza zavisnosti atributa tolls_amount i improvement_surcharge
 ```{r Analiza zavisnosti atributa tolls_amount i improvement_surcharge, message=FALSE, warning=FALSE, error=FALSE}
 tollsAmountImprovementSurcharge <- data %>%
-    group_by(tolls_amount) %>%
-    summarise(min = min(improvement_surcharge), max = max(improvement_surcharge), avg = mean(improvement_surcharge), median = median(improvement_surcharge)) %>%
+    group_by(improvement_surcharge) %>%
+    summarise(min = min(tolls_amount), max = max(tolls_amount), avg = mean(tolls_amount), median = median(tolls_amount)) %>%
     collect()
 
 kable(tollsAmountImprovementSurcharge)
 ```
-```{r Vizuelizacija zavisnosti atributa tolls_amount i improvement_surcharge, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa tolls_amount i improvement_surcharge, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tis <- data %>%
     select(tolls_amount, improvement_surcharge) %>%
     collect()
@@ -1761,7 +1756,7 @@ dev.off()
 ![Improvement surcharge po troškovima putarine](images/tollsAmountImprovementSurcharge.png)
 
 ### Analiza zavisnosti atributa tolls_amount i total_amount
-```{r Vizuelizacija zavisnosti atributa tolls_amount i total_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa tolls_amount i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tta <- data %>%
     select(tolls_amount, total_amount) %>%
     collect()
@@ -1781,7 +1776,7 @@ tollsAmountPayedWithCard <- data %>%
 
 kable(tollsAmountPayedWithCard)
 ```
-```{r Vizuelizacija zavisnosti atributa tolls_amount i payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa tolls_amount i payed_with_card, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tpc <- data %>%
     select(tolls_amount, payed_with_card) %>%
     collect()
@@ -1793,7 +1788,7 @@ dev.off()
 ![Troškovi putarine po načinu plaćanja](images/tollsAmountPayedWithCard.png)
 
 ### Analiza zavisnosti atributa improvement_surcharge i total_amount
-```{r Vizuelizacija zavisnosti atributa improvement_surcharge i total_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa improvement_surcharge i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 its <- data %>%
     select(improvement_surcharge, total_amount) %>%
     collect()
@@ -1813,7 +1808,7 @@ improvementSurchargePayedWithCard <- data %>%
 
 kable(improvementSurchargePayedWithCard)
 ```
-```{r Vizuelizacija zavisnosti atributa improvement_surcharge i payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa improvement_surcharge i payed_with_card, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 ipc <- data %>%
     select(improvement_surcharge, payed_with_card) %>%
     collect()
@@ -1825,7 +1820,7 @@ dev.off()
 ![Broj vožnji po improvement surcharge-u i načinu plaćanja](images/improvementSurchargePayedWithCard.png)
 
 ### Analiza zavisnosti atributa total_amount i payed_with_card
-```{r Vizuelizacija zavisnosti atributa total_amount i payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Vizuelizacija zavisnosti atributa total_amount i payed_with_card, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tpc <- data %>%
     select(total_amount, payed_with_card) %>%
     collect()
@@ -1881,7 +1876,7 @@ models_num <- 3
 ```{r Klasifikacioni modeli, message=FALSE, warning=FALSE, error=FALSE}
 models <- list()
 models[[1]] <- tip_amount ~ trip_distance + fare_amount + tolls_amount + total_amount + passenger_count
-models[[2]] <- tip_amount ~ VendorID + RatecodeID + PULocationID + DOLocationID
+models[[2]] <- tip_amount ~ VendorID + RatecodeID
 models[[3]] <- tip_amount ~ extra + mta_tax + improvement_surcharge + total_amount
 ```
 ## Linearna regresija
