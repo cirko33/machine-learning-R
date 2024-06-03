@@ -1,0 +1,5 @@
+install.packages("tidyverse")
+install.packages("sparklyr")
+install.packages("rmarkdown")
+install.packages("knitr")
+install.packages("pandoc")

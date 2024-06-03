@@ -1,9 +1,3 @@
-# install.packages("tidyverse")
-#install.packages("sparklyr")
-#install.packages("rmarkdown")
-#install.packages("knitr")
-#install.packages("pandoc")
-
 library(sparklyr)
 library(dplyr)
 library(knitr)
@@ -18,21 +12,24 @@ conf["spark.executor.memory"] <- "6G"
 conf["sparklyr.shell.driver-memory"] <- "6G"
 sc <- spark_connect(master = "local", config = conf)
 
+knitr::opts_knit$set(root.dir = file.path(getwd()))
 
 ds.path <- "~/FAX/RVPUII/projekat/data"
 ds.df <- spark_read_csv(sc, name = "my_data", path = ds.path, header = TRUE, infer_schema = TRUE, memory = TRUE)
 ds.filtered <- ds.df %>% 
-    select(-airport_fee, -congestion_surcharge) %>%
+    select(-airport_fee, -congestion_surcharge, ~store_and_fwd_flag) %>%
     filter(
       !is.na(VendorID) || !is.na(tpep_pickup_datetime) || !is.na(tpep_dropoff_datetime) || !is.na(passenger_count) || 
-      !is.na(trip_distance) || !is.na(RatecodeID) || !is.na(store_and_fwd_flag) || !is.na(PULocationID) || 
-      !is.na(DOLocationID) || !is.na(payment_type) || !is.na(fare_amount) || !is.na(extra) || !is.na(mta_tax) || 
-      !is.na(tip_amount) || !is.na(tolls_amount) || !is.na(improvement_surcharge) || !is.na(total_amount)
+      !is.na(trip_distance) || !is.na(RatecodeID) || !is.na(PULocationID) || !is.na(DOLocationID) ||
+      !is.na(payment_type) || !is.na(fare_amount) || !is.na(extra) || !is.na(mta_tax) || !is.na(tip_amount) || 
+      !is.na(tolls_amount) || !is.na(improvement_surcharge) || !is.na(total_amount)
     )
 
 data <- ds.filtered %>% 
-    mutate(received_tip = ifelse(tip_amount > 0, T, F))
+    mutate(received_tip = ifelse(tip_amount > 0, T, F)) %>%
+    mutate(payed_with_card = ifelse(payment_type == 1, T, F))
 
+ds <- NULL
 
 # Every attribute represented
 VendorIDs <- pull(data, VendorID)

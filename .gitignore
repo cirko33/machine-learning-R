@@ -2,3 +2,4 @@ spark/
 logs/
 spark-warehouse/
 data/
+derby.log
