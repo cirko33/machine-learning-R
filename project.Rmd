@@ -14,26 +14,26 @@ Podaci originalno preuzeti u **PARQUET** formatu, a zatim konvertovani u **CSV**
 Skup podataka se sastoji od podataka o kretanju taksi vozila i zaradi u Njujorku u januaru 2015. godine.
 
 ## Opis atributa
-Skup podataka se sastoji od atributa:
-- **VendorID** - identifikator provajdera usluge taksi prevoza
-- **tpep_pickup_datetime** - datum i vreme preuzimanja putnika
-- **tpep_dropoff_datetime** - datum i vreme iskrcavanja putnika
-- **passenger_count** - broj putnika
-- **trip_distance** - dužina putovanja u miljama
-- **RatecodeID** - identifikator tarifnog koda
-- **store_and_fwd_flag** - indikator da li je vožnja prvo sačuvana u memoriji pre slanja
-- **PULocationID** - identifikator lokacije preuzimanja putnika
-- **DOLocationID** - identifikator lokacije iskrcavanja putnika
-- **payment_type** - način plaćanja
-- **fare_amount** - cena vožnje
-- **extra** - dodatni troškovi
-- **mta_tax** - troškovi MTA
-- **tip_amount** - napojnica (popunjena samo za plaćanje karticom)
-- **tolls_amount** - troškovi putarine
-- **improvement_surcharge** - troškovi poboljšanja
-- **total_amount** - ukupna cena
-- **congestion_surcharge** - troškovi gužve
-- **airport_fee** - troškovi aerodroma
+Skup podataka se sastoji od atributa:<br/>
+1. **VendorID** - identifikator provajdera usluge taksi prevoza<br/>
+2. **tpep_pickup_datetime** - datum i vreme preuzimanja putnika<br/>
+3. **tpep_dropoff_datetime** - datum i vreme iskrcavanja putnika<br/>
+4. **passenger_count** - broj putnika<br/>
+5. **trip_distance** - dužina putovanja u miljama<br/>
+6. **RatecodeID** - identifikator tarifnog koda<br/>
+7. **store_and_fwd_flag** - indikator da li je vožnja prvo sačuvana u memoriji pre slanja<br/>
+8. **PULocationID** - identifikator lokacije preuzimanja putnika<br/>
+9. **DOLocationID** - identifikator lokacije iskrcavanja putnika<br/>
+10. **payment_type** - način plaćanja<br/>
+12. **fare_amount** - cena vožnje<br/>
+13. **extra** - dodatni troškovi<br/>
+14. **mta_tax** - troškovi MTA<br/>
+15. **tip_amount** - napojnica (popunjena samo za plaćanje karticom)<br/>
+16. **tolls_amount** - troškovi putarine<br/>
+17. **improvement_surcharge** - troškovi poboljšanja<br/>
+18. **total_amount** - ukupna cena<br/>
+19. **congestion_surcharge** - troškovi gužve<br/>
+20. **airport_fee** - troškovi aerodroma<br/>
 
 Specifikacija obeležja dostupna na [linku](https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf)
 
@@ -54,12 +54,12 @@ if __name__ == "__main__":
     csv_file_path = input("Enter output file: ") + ".csv"
     
     parquet_to_csv(parquet_file_path, csv_file_path)
-    print(f"Parquet file '{parquet_file_path}' has been converted to CSV file '{csv_file_path}'.")
+    
 ```
 
 # Implementacija
 ## Instalacija paketa
-```{r Instalacija paketa, eval=TRUE, include=TRUE}
+```{r Instalacija paketa, eval=FALSE, results='hide', message=FALSE, warning=FALSE, error=FALSE}
 install.packages("tidyverse")
 install.packages("sparklyr")
 install.packages("rmarkdown")
@@ -67,7 +67,7 @@ install.packages("knitr")
 install.packages("pandoc")
 ```
 ## Učitavanje paketa
-```{r Učitavanje paketa, eval=TRUE, include=TRUE}
+```{r Učitavanje paketa, results='hide', message=FALSE, warning=FALSE, error=FALSE}
 library(sparklyr)
 library(dplyr)
 library(knitr)
@@ -78,55 +78,58 @@ spark_install()
 knitr::opts_knit$set(root.dir = file.path(getwd()))
 ```
 ## Podešavanje Spark sesije
-```{r Podešavanje Spark sesije i knitr, eval=TRUE, include=TRUE}
+```{r Podešavanje Spark sesije i knitr, results='hide', message=FALSE, warning=FALSE, error=FALSE}
 conf <- spark_config()
 conf["spark.executor.memory"] <- "6G"
 conf["sparklyr.shell.driver-memory"] <- "6G"
 sc <- spark_connect(master = "local", config = conf)
 ```
-## Podešavanje working direktorijuma
-```{r Podešavanje working direktorijuma, eval=TRUE, include=TRUE}
-setwd("~/FAX/RVPUII/projekat")
-```
-
 ## Učitavanje skupa podataka
-```{r Učitavanje skupa podataka, eval=TRUE, include=TRUE}
+```{r Učitavanje skupa podataka, results='hide', message=FALSE, warning=FALSE, error=FALSE}
 ds.path <- "~/FAX/RVPUII/projekat/data"
 ds.df <- spark_read_csv(sc, name = "my_data", path = ds.path, header = TRUE, infer_schema = TRUE, memory = TRUE)
 ```
 
 ## Filtriranje skupa podataka
-```{r Filtriranje skupa podataka, eval=TRUE, include=TRUE}
+```{r Filtriranje skupa podataka, results='hide', message=FALSE, warning=FALSE, error=FALSE}
 ds.filtered <- ds.df %>% 
     select(-store_and_fwd_flag, -airport_fee, -congestion_surcharge) %>%
     filter(
-      !is.na(VendorID) || !is.na(tpep_pickup_datetime) || !is.na(tpep_dropoff_datetime) || !is.na(passenger_count) || 
-      !is.na(trip_distance) || !is.na(RatecodeID) || !is.na(PULocationID) || !is.na(DOLocationID) ||
-      !is.na(payment_type) || !is.na(fare_amount) || !is.na(extra) || !is.na(mta_tax) || !is.na(tip_amount) || 
-      !is.na(tolls_amount) || !is.na(improvement_surcharge) || !is.na(total_amount)
+      !(is.na(VendorID) || is.na(tpep_pickup_datetime) || is.na(tpep_dropoff_datetime) || is.na(passenger_count) || 
+      is.na(trip_distance) || is.na(RatecodeID) || is.na(PULocationID) || is.na(DOLocationID) ||
+      is.na(payment_type) || is.na(fare_amount) || is.na(extra) || is.na(mta_tax) || is.na(tip_amount) || 
+      is.na(tolls_amount) || is.na(improvement_surcharge) || is.na(total_amount))
     ) %>%
     filter(
-        trip_distance < 200 && trip_distance > 0
+        trip_distance >= 0 && trip_distance <= 200 && 
+        fare_amount >= 0 && fare_amount <= 200 &&
+        extra >= 0 && extra <= 1 &&
+        mta_tax >= 0 && mta_tax <= 1 &&
+        tip_amount >= 0 && tip_amount <= 200 &&
+        tolls_amount >= 0 && tolls_amount <= 200 && 
+        improvement_surcharge >= 0 && improvement_surcharge <= 200 &&
+        total_amount >= 0 && total_amount <= 300
     )
 ```
 
 ## Dodavanje novih atributa
-```{r Dodavanje novih atributa, eval=TRUE, include=TRUE}
+```{r Dodavanje novih atributa, results='hide', message=FALSE, warning=FALSE, error=FALSE}
 data <- ds.filtered %>% 
     mutate(payed_with_card = ifelse(payment_type == 1, T, F))
 ```
 
 ## Analiza pojedinačnih atributa
 ### Analiza atributa VendorID
-```{r Analiza atributa VendorID, eval=TRUE, include=TRUE}
+```{r Analiza atributa VendorID, message=FALSE, warning=FALSE, error=FALSE}
 vendorIdCounts <- data %>%
     group_by(VendorID) %>% 
     summarise(count = n()) %>% 
-    collect()
+    collect() %>% arrange(VendorID)
 
-print("Broj vožnji po VendorID-u")
 kable(vendorIdCounts)
+```
 
+```{r Vizuelizacija atributa VendorID, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 bar <- ggplot(vendorIdCounts, aes(x = VendorID, y = count, fill = VendorID)) +
     geom_bar(stat = "identity") +
     labs(title = "Broj vožnji po VendorID-u", x = "VendorID", y = "Broj vožnji") +
@@ -136,15 +139,15 @@ ggsave("images/vendorIdCounts.png", bar)
 ```
 ![Broj vožnji po VendorID-u](images/vendorIdCounts.png)
 ### Analiza atributa passenger_count
-```{r Analiza atributa passenger_count, eval=TRUE, include=TRUE}
+```{r Analiza atributa passenger_count, message=FALSE, warning=FALSE, error=FALSE}
 passengerCountCounts <- data %>%
     group_by(passenger_count) %>% 
     summarise(count = n()) %>% 
-    collect()
+    collect() %>% arrange(passenger_count)
 
-print("Broj vožnji po broju putnika")
 kable(passengerCountCounts)
-
+```
+```{r Vizuelizacija atributa passenger_count, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 passengerCounts <- pull(data, passenger_count)
 
 png("images/passengerCountHistogram.png", width = 800, height = 1200)
@@ -160,14 +163,15 @@ dev.off()
 ![Broj vožnji po broju putnika](images/passengerCountHistogram.png)
 
 ### Analiza atributa trip_distance
-```{r Analiza atributa trip_distance, eval=TRUE, include=TRUE}
+```{r Analiza atributa trip_distance, message=FALSE, warning=FALSE, error=FALSE}
 tripDistanceCounts <- data %>%
     summarise(min = min(trip_distance), max = max(trip_distance), avg = mean(trip_distance), median = median(trip_distance)) %>%
     collect()
 
-print("Statistika atributa trip_distance")
-kable(tripDistanceCounts)
 
+kable(tripDistanceCounts)
+```
+```{r Vizuelizacija atributa trip_distance, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tripDistances <- pull(data, trip_distance)
 png("images/tripDistanceDensity.png", width = 800, height = 1200)
 plt <- plot(density(tripDistances), main = "Distribucija atributa trip_distance", xlab = "Dužina putovanja", ylab = "Gustina")
@@ -176,15 +180,16 @@ dev.off()
 ![Distribucija atributa trip_distance](images/tripDistanceDensity.png)
 
 ### Analiza atributa RatecodeID
-```{r Analiza atributa RatecodeID, eval=TRUE, include=TRUE}
+```{r Analiza atributa RatecodeID, message=FALSE, warning=FALSE, error=FALSE}
 ratecodeIdCounts <- data %>%
     group_by(RatecodeID) %>% 
     summarise(count = n()) %>% 
-    collect()
+    collect() %>% arrange(RatecodeID)
 
-print("Broj vožnji po RatecodeID-u")
+
 kable(ratecodeIdCounts)
-
+```
+```{r Vizuelizacija atributa RatecodeID, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 bar <- ggplot(ratecodeIdCounts, aes(x = RatecodeID, y = count, fill = RatecodeID)) +
     geom_bar(stat = "identity") +
     labs(title = "Broj vožnji po RatecodeID-u", x = "RatecodeID", y = "Broj vožnji") +
@@ -196,15 +201,16 @@ ggsave("images/ratecodeIdCounts.png", bar)
 ![Broj vožnji po RatecodeID-u](images/ratecodeIdCounts.png)
 
 ### Analiza atributa PULocationID
-```{r Analiza atributa PULocationID, eval=TRUE, include=TRUE}
+```{r Analiza atributa PULocationID, message=FALSE, warning=FALSE, error=FALSE}
 puLocationIdCounts <- data %>%
     group_by(PULocationID) %>% 
     summarise(count = n()) %>% 
-    collect()
+    collect() %>% arrange(PULocationID)
 
-print("Broj vožnji po PULocationID-u")
+
 kable(puLocationIdCounts)
-
+```
+```{r Vizuelizacija atributa PULocationID, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 puLocationIds <- pull(data, PULocationID)
 png("images/puLocationIdHistogram.png", width = 800, height = 1200)
 hst <- hist(puLocationIds, main = "Broj vožnji po PULocationID-u", xlab = "PULocationID", ylab = "Broj vožnji")
@@ -213,15 +219,16 @@ dev.off()
 ![Broj vožnji po PULocationID-u](images/puLocationIdHistogram.png)
 
 ### Analiza atributa DOLocationID
-```{r Analiza atributa DOLocationID, eval=TRUE, include=TRUE}
+```{r Analiza atributa DOLocationID, message=FALSE, warning=FALSE, error=FALSE}
 doLocationIdCounts <- data %>%
     group_by(DOLocationID) %>% 
     summarise(count = n()) %>% 
-    collect()
+    collect() %>% arrange(DOLocationID)
 
-print("Broj vožnji po DOLocationID-u")
+
 kable(doLocationIdCounts)
-
+```
+```{r Vizuelizacija atributa DOLocationID, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 doLocationIds <- pull(data, DOLocationID)
 png("images/doLocationIdHistogram.png", width = 800, height = 1200)
 hst <- hist(doLocationIds, main = "Broj vožnji po DOLocationID-u", xlab = "DOLocationID", ylab = "Broj vožnji")
@@ -230,15 +237,16 @@ dev.off()
 ![Broj vožnji po DOLocationID-u](images/doLocationIdHistogram.png)
 
 ### Analiza atributa payment_type
-```{r Analiza atributa payment_type, eval=TRUE, include=TRUE}
+```{r Analiza atributa payment_type, message=FALSE, warning=FALSE, error=FALSE}
 paymentTypeCounts <- data %>%
     group_by(payment_type) %>% 
     summarise(count = n()) %>% 
-    collect()
+    collect() %>% arrange(payment_type)
 
-print("Broj vožnji po payment_type-u")
+
 kable(paymentTypeCounts)
-
+```
+```{r Vizuelizacija atributa payment_type, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 bar <- ggplot(paymentTypeCounts, aes(x = payment_type, y = count, fill = payment_type)) +
     geom_bar(stat = "identity") +
     labs(title = "Broj vožnji po payment_type-u", x = "payment_type", y = "Broj vožnji") +
@@ -250,14 +258,15 @@ ggsave("images/paymentTypeCounts.png", bar)
 ![Broj vožnji po payment_type-u](images/paymentTypeCounts.png)
 
 ### Analiza atributa fare_amount
-```{r Analiza atributa fare_amount, eval=TRUE, include=TRUE}
+```{r Analiza atributa fare_amount, message=FALSE, warning=FALSE, error=FALSE}
 fareAmountCounts <- data %>%
     summarise(min = min(fare_amount), max = max(fare_amount), avg = mean(fare_amount), median = median(fare_amount)) %>%
     collect()
 
-print("Statistika atributa fare_amount")
-kable(fareAmountCounts)
 
+kable(fareAmountCounts)
+```
+```{r Vizuelizacija atributa fare_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 fareAmounts <- pull(data, fare_amount)
 png("images/fareAmountDensity.png", width = 800, height = 1200)
 
@@ -265,18 +274,19 @@ plt <- plot(density(fareAmounts), main = "Distribucija atributa fare_amount", xl
 
 dev.off()
 ```
-![Distribucija atributa fare_amount](images/fareAmountBox.png)
+![Distribucija atributa fare_amount](images/fareAmountDensity.png)
 
 ### Analiza atributa extra
-```{r Analiza atributa extra, eval=TRUE, include=TRUE}
+```{r Analiza atributa extra, message=FALSE, warning=FALSE, error=FALSE}
 extraCounts <- data %>%
     group_by(extra) %>%
     summarise(count = n()) %>%
-    collect()
+    collect() %>% arrange(extra)
 
-print("Broj vožnji po extra")
+
 kable(extraCounts)
-
+```
+```{r Vizuelizacija atributa extra, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 extraValues <- pull(data, extra)
 bar <- ggplot(extraCounts, aes(x = extra, y = count, fill = extra)) +
     geom_bar(stat = "identity", width = 0.4) +
@@ -289,24 +299,57 @@ ggsave("images/extraCounts.png", bar)
 ![Broj vožnji po extra](images/extraCounts.png)
 
 ### Analiza atributa mta_tax
-```{r Analiza atributa mta_tax, eval=TRUE, include=TRUE}
+```{r Analiza atributa mta_tax, message=FALSE, warning=FALSE, error=FALSE}
 mtaTaxCounts <- data %>%
     group_by(mta_tax) %>%
     summarise(count = n()) %>%
-    collect()
+    collect() %>% arrange(mta_tax)
 
-print("Broj vožnji po mta_tax")
+
 kable(mtaTaxCounts)
-
+```
+```{r Vizuelizacija atributa mta_tax, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 mtaTaxValues <- pull(data, mta_tax)
 bar <- ggplot(mtaTaxCounts, aes(x = mta_tax, y = count, fill = mta_tax)) +
     geom_bar(stat = "identity", width = 0.4) +
     labs(title = "Broj vožnji po mta_tax", x = "mta_tax", y = "Broj vožnji") +
-    scale_y_continuous(breaks = seq(0, 5000000, 100000), limits=c(0, 5000000)) + 
+    scale_y_continuous(breaks = seq(0, 13000000, 1000000), limits=c(0, 13000000)) + 
     scale_x_continuous(breaks = seq(-1, 1, 0.5), limits=c(-1, 1))
-bar
+
 ggsave("images/mtaTaxCounts.png", bar)
 ```
+![Broj vožnji po mta_tax](images/mtaTaxCounts.png)
+
+### Analiza atributa tip_amount
+```{r Analiza atributa tip_amount, message=FALSE, warning=FALSE, error=FALSE}
+tipAmountCounts <- data %>%
+    summarise(min = min(tip_amount), max = max(tip_amount), avg = mean(tip_amount), median = median(tip_amount)) %>%
+    collect()
 
 
+kable(tipAmountCounts)
+```
+```{r Vizuelizacija atributa tip_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+tipAmounts <- pull(data, tip_amount)
+png("images/tipAmountDensity.png", width = 800, height = 1200)
+plt <- plot(density(tipAmounts), main = "Distribucija atributa tip_amount", xlab = "Napojnica", ylab = "Gustina", xlim = c(0, 20))
+dev.off()
+```
+![Distribucija atributa tip_amount](images/tipAmountDensity.png)
 
+### Analiza atributa tolls_amount
+```{r Analiza atributa tolls_amount, message=FALSE, warning=FALSE, error=FALSE}
+tollsAmountCounts <- data %>%
+    summarise(min = min(tolls_amount), max = max(tolls_amount), avg = mean(tolls_amount), median = median(tolls_amount)) %>%
+    collect()
+
+
+kable(tollsAmountCounts)
+```
+```{r Vizuelizacija atributa tolls_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+tollsAmounts <- pull(data, tolls_amount)
+png("images/tollsAmountDensity.png", width = 800, height = 1200)
+plt <- plot(density(tollsAmounts), main = "Distribucija atributa tolls_amount", xlab = "Troškovi putarine", ylab = "Gustina",  xlim = c(0, 20))
+dev.off()
+```
+![Distribucija atributa tolls_amount](images/tollsAmountDensity.png)
