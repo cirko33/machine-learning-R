@@ -65,6 +65,7 @@ install.packages("sparklyr")
 install.packages("rmarkdown")
 install.packages("knitr")
 install.packages("pandoc")
+install.packages("dbplot")
 ```
 ## Učitavanje paketa
 ```{r Učitavanje paketa, results='hide', message=FALSE, warning=FALSE, error=FALSE}
@@ -73,6 +74,7 @@ library(dplyr)
 library(knitr)
 library(rmarkdown)
 library(ggplot2)
+library(dbplot)
 library(pandoc)
 spark_install()
 knitr::opts_knit$set(root.dir = file.path(getwd()))
@@ -93,14 +95,15 @@ ds.df <- spark_read_csv(sc, name = "my_data", path = ds.path, header = TRUE, inf
 ## Filtriranje skupa podataka
 ```{r Filtriranje skupa podataka, results='hide', message=FALSE, warning=FALSE, error=FALSE}
 ds.filtered <- ds.df %>% 
-    select(-store_and_fwd_flag, -airport_fee, -congestion_surcharge) %>%
+    select(-store_and_fwd_flag, -airport_fee, -congestion_surcharge, -tpep_pickup_datetime, -tpep_dropoff_datetime) %>%
     filter(
-      !(is.na(VendorID) || is.na(tpep_pickup_datetime) || is.na(tpep_dropoff_datetime) || is.na(passenger_count) || 
-      is.na(trip_distance) || is.na(RatecodeID) || is.na(PULocationID) || is.na(DOLocationID) ||
-      is.na(payment_type) || is.na(fare_amount) || is.na(extra) || is.na(mta_tax) || is.na(tip_amount) || 
-      is.na(tolls_amount) || is.na(improvement_surcharge) || is.na(total_amount))
+      !(is.na(VendorID) || is.na(passenger_count) || is.na(trip_distance) || is.na(RatecodeID) ||
+       is.na(PULocationID) || is.na(DOLocationID) || is.na(payment_type) || is.na(fare_amount) ||
+       is.na(extra) || is.na(mta_tax) || is.na(tip_amount) || is.na(tolls_amount) || 
+       is.na(improvement_surcharge) || is.na(total_amount))
     ) %>%
     filter(
+        RatecodeID >= 1 && RatecodeID <= 6 &&
         trip_distance >= 0 && trip_distance <= 200 && 
         fare_amount >= 0 && fare_amount <= 200 &&
         extra >= 0 && extra <= 1 &&
@@ -108,7 +111,8 @@ ds.filtered <- ds.df %>%
         tip_amount >= 0 && tip_amount <= 200 &&
         tolls_amount >= 0 && tolls_amount <= 200 && 
         improvement_surcharge >= 0 && improvement_surcharge <= 200 &&
-        total_amount >= 0 && total_amount <= 300
+        total_amount >= 0 && total_amount <= 300 &&
+        payment_type >= 1 && payment_type <= 6
     )
 ```
 
@@ -130,14 +134,13 @@ kable(vendorIdCounts)
 ```
 
 ```{r Vizuelizacija atributa VendorID, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-bar <- ggplot(vendorIdCounts, aes(x = VendorID, y = count, fill = VendorID)) +
-    geom_bar(stat = "identity") +
-    labs(title = "Broj vožnji po VendorID-u", x = "VendorID", y = "Broj vožnji") +
-    scale_y_continuous(breaks = seq(0, 10000000, 1000000))
-
-ggsave("images/vendorIdCounts.png", bar)
+vds <- pull(data, VendorID)
+png("images/vendorIdCounts.png", width = 800, height = 1200)
+pi <- pie(table(vds), main = "Broj vožnji po VendorID-u", labels = c("VendorID 1", "VendorID 2"))
+dev.off()
 ```
 ![Broj vožnji po VendorID-u](images/vendorIdCounts.png)
+
 ### Analiza atributa passenger_count
 ```{r Analiza atributa passenger_count, message=FALSE, warning=FALSE, error=FALSE}
 passengerCountCounts <- data %>%
@@ -353,3 +356,260 @@ plt <- plot(density(tollsAmounts), main = "Distribucija atributa tolls_amount", 
 dev.off()
 ```
 ![Distribucija atributa tolls_amount](images/tollsAmountDensity.png)
+
+### Analiza atributa improvement_surcharge
+```{r Analiza atributa improvement_surcharge, message=FALSE, warning=FALSE, error=FALSE}
+improvementSurchargeCounts <- data %>%
+    summarise(min = min(improvement_surcharge), max = max(improvement_surcharge), avg = mean(improvement_surcharge), median = median(improvement_surcharge)) %>%
+    collect()
+
+kable(improvementSurchargeCounts)
+```
+```{r Vizuelizacija atributa improvement_surcharge, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+improvementSurcharge <- pull(data, improvement_surcharge)
+png("images/improvementSurchargeDensity.png", width = 800, height = 1200)
+plt <- plot(density(improvementSurcharge), main = "Distribucija atributa improvement_surcharge", xlab = "Troškovi poboljšanja", ylab = "Gustina", xlim = c(0, 0.4))
+dev.off()
+```
+![Distribucija atributa improvement_surcharge](images/improvementSurchargeDensity.png)
+
+### Analiza atributa total_amount
+```{r Analiza atributa total_amount, message=FALSE, warning=FALSE, error=FALSE}
+totalAmountCounts <- data %>%
+    summarise(min = min(total_amount), max = max(total_amount), avg = mean(total_amount), median = median(total_amount)) %>%
+    collect()
+
+kable(totalAmountCounts)
+```
+```{r Vizuelizacija atributa total_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+totalAmount <- pull(data, total_amount)
+png("images/totalAmountDensity.png", width = 800, height = 1200)
+plt <- plot(density(totalAmount), main = "Distribucija atributa total_amount", xlab = "Ukupna cena", ylab = "Gustina", xlim = c(0, 300))
+dev.off()
+```
+![Distribucija atributa total_amount](images/totalAmountDensity.png)
+
+### Analiza atributa payed_with_card
+```{r Analiza atributa payed_with_card, message=FALSE, warning=FALSE, error=FALSE}
+payedWithCardCounts <- data %>%
+    group_by(payed_with_card) %>%
+    summarise(count = n()) %>%
+    collect()
+
+kable(payedWithCardCounts)
+```
+```{r Vizuelizacija atributa payed_with_card, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+py <- pull(data, payed_with_card)
+png("images/payedWithCardCounts.png", width = 800, height = 1200)
+pi <- pie(table(py), main = "Broj vožnji po načinu plaćanja", labels = c("Plaćeno karticom", "Nije plaćeno karticom"))
+dev.off()
+```
+![Broj vožnji po načinu plaćanja](images/payedWithCardCounts.png)
+
+## Analiza zavisnosti atributa
+### Analiza zavisnosti atributa VendorID i passenger_count
+```{r Analiza zavisnosti atributa VendorID i passenger_count, message=FALSE, warning=FALSE, error=FALSE}
+vendorIdPassengerCount <- data %>%
+    group_by(VendorID, passenger_count) %>%
+    summarise(count = n()) %>%
+    collect() %>% arrange(VendorID, passenger_count)
+
+kable(vendorIdPassengerCount)
+```
+```{r Vizuelizacija zavisnosti atributa VendorID i passenger_count, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+vxp <- data %>%
+    select(VendorID, passenger_count) %>%
+    collect()
+
+png("images/vendorIdPassengerCount.png", width = 800, height = 1200)
+boxplot(passenger_count ~ VendorID, data = vxp, main = "Broj vožnji po VendorID-u i broju putnika", xlab = "VendorID", ylab = "Broj putnika")
+dev.off()
+```
+![Broj vožnji po VendorID-u i broju putnika](images/vendorIdPassengerCount.png)
+
+### Analiza zavisnosti atributa VendorID i trip_distance
+```{r Analiza zavisnosti atributa VendorID i trip_distance, message=FALSE, warning=FALSE, error=FALSE}
+vendorIdTripDistance <- data %>%
+    group_by(VendorID) %>%
+    summarise(min = min(trip_distance), max = max(trip_distance), avg = mean(trip_distance), median = median(trip_distance)) %>%
+    collect()
+
+kable(vendorIdTripDistance)
+```
+```{r Vizuelizacija zavisnosti atributa VendorID i trip_distance, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+vtd <- data %>%
+    select(VendorID, trip_distance) %>%
+    collect()
+
+png("images/vendorIdTripDistance.png", width = 800, height = 1200)
+boxplot(trip_distance ~ VendorID, data = vtd, main = "Dužina putovanja po VendorID-u", xlab = "VendorID", ylab = "Dužina putovanja")
+dev.off()
+```
+![Dužina putovanja po VendorID-u](images/vendorIdTripDistance.png)
+
+### Analiza zavisnosti atributa VendorID i RatecodeID
+```{r Analiza zavisnosti atributa VendorID i RatecodeID, message=FALSE, warning=FALSE, error=FALSE}
+vendorIdRatecodeId <- data %>%
+    group_by(VendorID, RatecodeID) %>%
+    summarise(count = n()) %>%
+    collect() %>% arrange(VendorID, RatecodeID)
+
+kable(vendorIdRatecodeId)
+```
+```{r Vizuelizacija zavisnosti atributa VendorID i RatecodeID, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+vri <- data %>%
+    select(VendorID, RatecodeID) %>%
+    filter(RatecodeID >= 1 && RatecodeID <= 6) %>%
+    collect()
+
+png("images/vendorIdRatecodeId.png", width = 800, height = 1200)
+barplot(table(vri), beside = T, main = "Broj vožnji po VendorID-u i RatecodeID-u", xlab = "VendorID", ylab = "Broj vožnji", col = c("red", "blue"), legend = rownames(m))
+dev.off()
+```
+![Broj vožnji po VendorID-u i RatecodeID-u](images/vendorIdRatecodeId.png)
+
+### Analiza zavisnosti atributa VendorID i PULocationID
+```{r Analiza zavisnosti atributa VendorID i PULocationID, message=FALSE, warning=FALSE, error=FALSE}
+vendorIdPULocationId <- data %>%
+    group_by(VendorID, PULocationID) %>%
+    summarise(count = n()) %>%
+    collect() %>% arrange(VendorID, PULocationID)
+
+kable(vendorIdPULocationId)
+```
+```{r Vizuelizacija zavisnosti atributa VendorID i PULocationID, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+vpli <- data %>%
+    select(VendorID, PULocationID) %>%
+    collect()
+
+png("images/vendorIdPULocationId.png", width = 800, height = 1200)
+boxplot(PULocationID ~ VendorID, data = vpli, main = "Broj vožnji po VendorID-u i PULocationID-u", xlab = "VendorID", ylab = "PULocationID")
+dev.off()
+```
+![Broj vožnji po VendorID-u i PULocationID-u](images/vendorIdPULocationId.png)
+
+### Analiza zavisnosti atributa VendorID i DOLocationID
+```{r Analiza zavisnosti atributa VendorID i DOLocationID, message=FALSE, warning=FALSE, error=FALSE}
+vendorIdDOLocationId <- data %>%
+    group_by(VendorID, DOLocationID) %>%
+    summarise(count = n()) %>%
+    collect() %>% arrange(VendorID, DOLocationID)
+
+kable(vendorIdDOLocationId)
+```
+```{r Vizuelizacija zavisnosti atributa VendorID i DOLocationID, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+vdli <- data %>%
+    select(VendorID, DOLocationID) %>%
+    collect()
+
+png("images/vendorIdDOLocationId.png", width = 800, height = 1200)
+boxplot(DOLocationID ~ VendorID, data = vdli, main = "Broj vožnji po VendorID-u i DOLocationID-u", xlab = "VendorID", ylab = "DOLocationID")
+dev.off()
+```
+![Broj vožnji po VendorID-u i DOLocationID-u](images/vendorIdDOLocationId.png)
+
+### Analiza zavisnosti atributa VendorID i payment_type
+```{r Analiza zavisnosti atributa VendorID i payment_type, message=FALSE, warning=FALSE, error=FALSE}
+vendorIdPaymentType <- data %>%
+    group_by(VendorID, payment_type) %>%
+    summarise(count = n()) %>%
+    collect() %>% arrange(VendorID, payment_type)
+
+kable(vendorIdPaymentType)
+```
+```{r Vizuelizacija zavisnosti atributa VendorID i payment_type, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+vpt <- data %>%
+    select(VendorID, payment_type) %>%
+    collect()
+
+png("images/vendorIdPaymentType.png", width = 800, height = 1200)
+barplot(table(vpt), beside = T, main = "Broj vožnji po VendorID-u i payment_type-u", xlab = "VendorID", ylab = "Broj vožnji", col = c("red", "blue", "green", "yellow", "purple", "orange"), legend = rownames(table(vpt)))
+dev.off()
+```
+![Broj vožnji po VendorID-u i payment_type-u](images/vendorIdPaymentType.png)
+
+### Analiza zavisnosti atributa VendorID i fare_amount
+```{r Analiza zavisnosti atributa VendorID i fare_amount, message=FALSE, warning=FALSE, error=FALSE}
+vendorIdFareAmount <- data %>%
+    group_by(VendorID) %>%
+    summarise(min = min(fare_amount), max = max(fare_amount), avg = mean(fare_amount), median = median(fare_amount)) %>%
+    collect()
+
+kable(vendorIdFareAmount)
+```
+```{r Vizuelizacija zavisnosti atributa VendorID i fare_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+vfa <- data %>%
+    select(VendorID, fare_amount) %>%
+    collect()
+
+png("images/vendorIdFareAmount.png", width = 800, height = 1200)
+boxplot(fare_amount ~ VendorID, data = vfa, main = "Cena vožnje po VendorID-u", xlab = "VendorID", ylab = "Cena vožnje")
+dev.off()
+```
+![Cena vožnje po VendorID-u](images/vendorIdFareAmount.png)
+
+### Analiza zavisnosti atributa VendorID i extra
+```{r Analiza zavisnosti atributa VendorID i extra, message=FALSE, warning=FALSE, error=FALSE}
+vendorIdExtra <- data %>%
+    group_by(VendorID) %>%
+    summarise(min = min(extra), max = max(extra), avg = mean(extra), median = median(extra)) %>%
+    collect()
+
+kable(vendorIdExtra)
+```
+```{r Vizuelizacija zavisnosti atributa VendorID i extra, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+vex <- data %>%
+    select(VendorID, extra) %>%
+    collect()
+
+png("images/vendorIdExtra.png", width = 800, height = 1200)
+barplot(table(vex), beside = T, main = "Broj vožnji po VendorID-u i extra", 
+    xlab = "VendorID", ylab = "Broj vožnji", col = c("red", "blue"), 
+    legend = rownames(table(vex)),)
+dev.off()
+```
+![Broj vožnji po VendorID-u i extra](images/vendorIdExtra.png)
+
+### Analiza zavisnosti atributa VendorID i mta_tax
+```{r Analiza zavisnosti atributa VendorID i mta_tax, message=FALSE, warning=FALSE, error=FALSE}
+vendorIdMtaTax <- data %>%
+    group_by(VendorID, mta_tax) %>%
+    collect()
+
+kable(vendorIdMtaTax)
+```
+```{r Vizuelizacija zavisnosti atributa VendorID i mta_tax, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+vmt <- data %>%
+    select(VendorID, mta_tax) %>%
+    collect()
+
+png("images/vendorIdMtaTax.png", width = 800, height = 1200)
+mosaicplot(table(vmt), main = "Broj vožnji po VendorID-u i mta_tax", xlab = "VendorID", ylab = "mta_tax", color = c("red", "blue", "green", "yellow", "purple", "orange"))
+dev.off()
+```
+![Broj vožnji po VendorID-u i mta_tax](images/vendorIdMtaTax.png)
+
+### Analiza zavisnosti atributa VendorID i tip_amount
+```{r Analiza zavisnosti atributa VendorID i tip_amount, message=FALSE, warning=FALSE, error=FALSE}
+vendorIdTipAmount <- data %>%
+    group_by(VendorID) %>%
+    summarise(min = min(tip_amount), max = max(tip_amount), avg = mean(tip_amount), median = median(tip_amount)) %>%
+    collect()
+
+kable(vendorIdTipAmount)
+```
+```{r Vizuelizacija zavisnosti atributa VendorID i tip_amount, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+vta <- data %>%
+    select(VendorID, tip_amount) %>%
+    collect()
+
+png("images/vendorIdTipAmount.png", width = 800, height = 1200)
+boxplot(tip_amount ~ VendorID, data = vta, main = "Napojnica po VendorID-u", xlab = "VendorID", ylab = "Napojnica")
+dev.off()
+```
+
+
+
+
+
+

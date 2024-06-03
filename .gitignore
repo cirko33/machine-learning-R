@@ -3,3 +3,5 @@ logs/
 spark-warehouse/
 data/
 derby.log
+.RData
+.Rhistory
