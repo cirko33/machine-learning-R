@@ -99,8 +99,8 @@ ds.filtered <- ds.df %>%
     select(VendorID, passenger_count, trip_distance, RatecodeID, payment_type, fare_amount, extra, mta_tax, tip_amount, tolls_amount, improvement_surcharge, total_amount) %>%
     filter(
       !(is.na(VendorID) || is.na(passenger_count) || is.na(trip_distance) || is.na(RatecodeID) ||
-        is.na(payment_type) || is.na(fare_amount) || is.na(improvement_surcharge) || is.na(total_amount)) ||
-        is.na(extra) || is.na(mta_tax) || is.na(tip_amount) || is.na(tolls_amount)
+        is.na(payment_type) || is.na(fare_amount) || is.na(improvement_surcharge) || is.na(total_amount) ||
+        is.na(extra) || is.na(mta_tax) || is.na(tip_amount) || is.na(tolls_amount))
     ) %>%
     filter(
         RatecodeID >= 1 && RatecodeID <= 6 &&
@@ -1947,8 +1947,8 @@ ds.filtered <- ds.df %>%
     select(VendorID, passenger_count, trip_distance, RatecodeID, payment_type, fare_amount, extra, mta_tax, tip_amount, tolls_amount, improvement_surcharge, total_amount) %>%
     filter(
       !(is.na(VendorID) || is.na(passenger_count) || is.na(trip_distance) || is.na(RatecodeID) ||
-        is.na(payment_type) || is.na(fare_amount) || is.na(improvement_surcharge) || is.na(total_amount)) ||
-        is.na(extra) || is.na(mta_tax) || is.na(tip_amount) || is.na(tolls_amount)
+        is.na(payment_type) || is.na(fare_amount) || is.na(improvement_surcharge) || is.na(total_amount) ||
+        is.na(extra) || is.na(mta_tax) || is.na(tip_amount) || is.na(tolls_amount))
     ) %>%
     filter(
         RatecodeID >= 1 && RatecodeID <= 6 &&
@@ -1968,32 +1968,71 @@ ds.filtered <- ds.df %>%
 model_data <- data %>% 
     filter(paid_with_card == T)
 
-data_splitted <- sdf_random_split(model_data, training = 0.7, testing = 0.3)
-models_num <- 3
+model_data <- model_data %>% 
+    mutate(tip_status = cut(
+        tip_amount,
+        breaks = c(0, 1, 5, 10, Inf),
+        labels = c("NONE", "LOW", "MID", "HIGH"),
+        right = FALSE
+    ))
+
+data_splitted <- sdf_random_split(model_data, training=0.9, test = 0.1, seed = 1)
+
 ```
 ## Klasifikacioni modeli
 ```{r Klasifikacioni modeli, message=FALSE, warning=FALSE, error=FALSE}
 models <- list()
-models[[1]] <- tip_amount ~ trip_distance + fare_amount + tolls_amount + total_amount + passenger_count
-models[[2]] <- tip_amount ~ VendorID + RatecodeID
-models[[3]] <- tip_amount ~ extra + mta_tax + improvement_surcharge + total_amount
+models[[1]] <- tip_status ~ trip_distance + fare_amount + tolls_amount + total_amount + passenger_count
+models[[2]] <- tip_status ~ VendorID + RatecodeID + extra + fare_amount 
+models[[3]] <- tip_status ~ extra + mta_tax + improvement_surcharge + total_amount
 ```
-## Linearna regresija
-```{r Linearna regresija, message=FALSE, warning=FALSE, error=FALSE}
-linear_models <- list()
-evaluations <- list()
+## Logistička regresija
+```{r Logistička regresija, message=FALSE, warning=FALSE, error=FALSE}
+logistic_models <- list()
+logistic_evals <- list()
 
-for(i in 1:models_num){
-    linear_models[[i]] <- ml_linear_regression(data_splitted$train, models[[i]])
-    evaluations[[i]] <- ml_evaluate(linear_models[[i]], data_splitted$test)
+for(i in 1:length(models)){
+    logistic_models[[i]] <- ml_logistic_regression(data_splitted$train, models[[i]])
+    logistic_evals[[i]] <- ml_evaluate(logistic_models[[i]], data_splitted$test)
 
-    print(evaluations[[i]]$residuals())
-    print(evaluations[[i]]$mean_absolute_error)
-    
+    print(paste("Model number", i))
+    print(paste("Accuracy", logistic_evals[[i]]$accuracy()))
+    print(paste("Precision", logistic_evals[[i]]$precision()))
+}
+
+# Validacija modela
+vfolds <- sdf_random_split(
+    model_data, 
+    weights = purrr::set_names(rep(0.25, 4), paste0("k", 1:4)),
+    seed = 1
+)
+
+logistic_errors <- list()
+for(j in 1:4){
+    train <- do.call(rbind, vfolds[-j])
+    test <- vfolds[[j]]
+    model <- ml_logistic_regression(train, models[[1]])
+    eval <- ml_evaluate(model, test)
+    logistic_errors[[j]] <- 1 - eval$accuracy()
 }
 ```
+## Mašina potpornih vektora
+```{r Mašina potpornih vektora, message=FALSE, warning=FALSE, error=FALSE}
+svm_models <- list()
+svm_evaluations <- list()
 
+for(i in 1:models_num){
+    svm_models[[i]] <- ml_linear_svc(data_splitted$train, models[[i]])
+    svm_evaluations[[i]] <- ml_evaluate(svm_models[[i]], data_splitted$test)
+}
+```
+## Stablo odlučivanja
+```{r Stablo odlučivanja, message=FALSE, warning=FALSE, error=FALSE}
+dt_models <- list()
+dt_evaluations <- list()
 
-
-
-
+for(i in 1:models_num){
+    dt_models[[i]] <- ml_decision_tree_classifier(data_splitted$train, models[[i]])
+    dt_evaluations[[i]] <- ml_evaluate(dt_models[[i]], data_splitted$test)
+}
+```
