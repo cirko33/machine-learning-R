@@ -158,6 +158,7 @@ dev.off()
 clearFn()
 ```
 ![Broj vožnji po broju putnika](images/passengerCountHistogram.png)
+
 ### Analiza atributa trip_distance
 ```{r Analiza atributa trip_distance, message=FALSE, warning=FALSE, error=FALSE}
 tripDistanceCounts <- data %>%
@@ -174,6 +175,7 @@ dev.off()
 clearFn()
 ```
 ![Distribucija atributa trip_distance](images/tripDistanceDensity.png)
+
 ### Analiza atributa payment_type
 ```{r Analiza atributa payment_type, message=FALSE, warning=FALSE, error=FALSE}
 paymentTypeCounts <- data %>%
@@ -194,6 +196,7 @@ ggsave("images/paymentTypeCounts.png", bar)
 clearFn()
 ```
 ![Broj vožnji po payment_type-u](images/paymentTypeCounts.png)
+
 ### Analiza atributa fare_amount
 ```{r Analiza atributa fare_amount, message=FALSE, warning=FALSE, error=FALSE}
 fareAmountCounts <- data %>%
@@ -213,6 +216,7 @@ dev.off()
 clearFn()
 ```
 ![Distribucija atributa fare_amount](images/fareAmountDensity.png)
+
 ### Analiza atributa tip_amount
 ```{r Analiza atributa tip_amount, message=FALSE, warning=FALSE, error=FALSE}
 tipAmountCounts <- data %>%
@@ -230,6 +234,7 @@ dev.off()
 clearFn()
 ```
 ![Distribucija atributa tip_amount](images/tipAmountDensity.png)
+
 ### Analiza atributa tolls_amount
 ```{r Analiza atributa tolls_amount, message=FALSE, warning=FALSE, error=FALSE}
 tollsAmountCounts <- data %>%
@@ -247,6 +252,7 @@ dev.off()
 clearFn()
 ```
 ![Distribucija atributa tolls_amount](images/tollsAmountDensity.png)
+
 ### Analiza atributa total_amount
 ```{r Analiza atributa total_amount, message=FALSE, warning=FALSE, error=FALSE}
 totalAmountCounts <- data %>%
@@ -344,6 +350,7 @@ boxplot(fare_amount ~ passenger_count, data = pfa, main = "Cena vožnje po broju
 dev.off()
 clearFn()
 ```
+![Cena vožnje po broju putnika](images/passengerCountFareAmount.png)
 
 ### Analiza zavisnosti atributa passenger_count i tip_amount
 ```{r Analiza zavisnosti atributa passenger_count i tip_amount, message=FALSE, warning=FALSE, error=FALSE}
@@ -386,6 +393,7 @@ dev.off()
 clearFn()
 ```
 ![Troškovi putarine po broju putnika](images/passengerCountTollsAmount.png)
+
 ### Analiza zavisnosti atributa passenger_count i total_amount
 ```{r Analiza zavisnosti atributa passenger_count i total_amount, message=FALSE, warning=FALSE, error=FALSE}
 passengerCountTotalAmount <- data %>%
@@ -427,6 +435,7 @@ dev.off()
 clearFn()
 ```
 ![Broj vožnji po broju putnika i načinu plaćanja](images/passengerCountTipStatus.png)
+
 ### Analiza zavisnosti atributa trip_distance i payment_type
 ```{r Analiza zavisnosti atributa trip_distance i payment_type, message=FALSE, warning=FALSE, error=FALSE}
 tripDistancePaymentType <- data %>%
@@ -482,6 +491,7 @@ dev.off()
 clearFn()
 ```
 ![Dužina putovanja po troškovima putarine](images/tripDistanceTollsAmount.png)
+
 ### Analiza zavisnosti atributa trip_distance i total_amount
 ```{r Vizuelizacija zavisnosti atributa trip_distance i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tta <- data %>%
@@ -515,6 +525,7 @@ dev.off()
 clearFn()
 ```
 ![Dužina putovanja po načinu plaćanja](images/tripDistanceTipStatus.png)
+
 ### Analiza zavisnosti atributa payment_type i fare_amount
 ```{r Analiza zavisnosti atributa payment_type i fare_amount, message=FALSE, warning=FALSE, error=FALSE}
 paymentTypeFareAmount <- data %>%
@@ -535,6 +546,7 @@ dev.off()
 clearFn()
 ```
 ![Cena vožnje po payment_type-u](images/paymentTypeFareAmount.png)
+
 ### Analiza zavisnosti atributa payment_type i tip_amount
 ```{r Analiza zavisnosti atributa payment_type i tip_amount, message=FALSE, warning=FALSE, error=FALSE}
 paymentTypeTipAmount <- data %>%
@@ -554,6 +566,7 @@ boxplot(tip_amount ~ payment_type, data = pta, main = "Napojnica po payment_type
 dev.off()
 ```
 ![Napojnica po payment_type-u](images/paymentTypeTipAmount.png)
+
 ### Analiza zavisnosti atributa payment_type i tolls_amount
 ```{r Analiza zavisnosti atributa payment_type i tolls_amount, message=FALSE, warning=FALSE, error=FALSE}
 paymentTypeTollsAmount <- data %>%
@@ -573,6 +586,7 @@ boxplot(tolls_amount ~ payment_type, data = pta, main = "Troškovi putarine po p
 dev.off()
 ```
 ![Troškovi putarine po payment_type-u](images/paymentTypeTollsAmount.png)
+
 ### Analiza zavisnosti atributa payment_type i total_amount
 ```{r Analiza zavisnosti atributa payment_type i total_amount, message=FALSE, warning=FALSE, error=FALSE}
 paymentTypeTotalAmount <- data %>%
@@ -669,7 +683,7 @@ fpc <- data %>%
     collect()
 
 png("images/fareAmountTipStatus.png", width = 300, height = 400)
-mosaicplot(table(fpc), main = "Broj vožnji po ceni vožnje i načinu plaćanja", xlab = "fare_amount", ylab = "tip_status", color = c("red", "blue"))
+boxplot(fare_amount ~ tip_status, data = fpc, main = "Cena vožnje po načinu plaćanja", xlab = "Način plaćanja", ylab = "Cena vožnje")
 dev.off()
 clearFn()
 ```
@@ -770,7 +784,7 @@ clearFn()
 ![Ukupna cena po načinu plaćanja](images/totalAmountTipStatus.png)
 
 ### Matrica korelacije
-```{r korelaciona-matrica-obelezja, include=TRUE}
+```{r Matrica korelacije, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 local_df <- data %>% 
     select(-tip_status) %>%
   sdf_sample(fraction = 0.8, replacement = FALSE, seed=1) %>%
@@ -946,7 +960,7 @@ ggsave("images/dtAccDepth.png", p)
 ![Zavisnost preciznosti od maksimalne dubine](images/dtAccDepth.png)
 
 ### Validacija
-```{r Validacija 2, eval==FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Validacija 2, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pip <- sc %>% 
     ml_pipeline() %>%
     ft_r_formula(formula) %>%
@@ -977,7 +991,7 @@ Time, biramo model sa maksimalnom dubinom stabla od 15.
 
 ## Random forest
 ### Obučavanje i evaluacija modela
-```{r Random forest, message=FALSE, warning=FALSE, error=FALSE}
+```{r Random forest, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 smp <- c(1:3)
 num.trees <- smp * 5
 
