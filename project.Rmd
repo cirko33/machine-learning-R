@@ -989,10 +989,9 @@ Time, biramo model sa 5 stabala.
 # Klasterizacija
 ## Priprema podataka
 ```{r Priprema podataka, message=FALSE, warning=FALSE, error=FALSE}
-cluster_data <- data %>%
+features <- data %>%
     select(total_amount, tip_amount, trip_distance, fare_amount)
 formula <- trip_distance ~ total_amount + tip_amount + fare_amount
-cp <- copy_to(sc, cluster_data, "cd", overwrite = TRUE)
 ```
 ### Funkcija za čišćenje memorije
 ```{r Funkcija za čišćenje memorije, results='hide', message=FALSE, warning=FALSE, error=FALSE}
@@ -1008,56 +1007,74 @@ clearFn2 <- function() {
 ### Biranje K
 ```{r Biranje K, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 clustered <- list()
-for(k in 2:5) {
-  clustered[[k]] <- ml_bisecting_kmeans(x=cp, formula=formula, k = k, max_iter = 10)
+for(k in 2:10) {
+  clustered[[k]] <- features %>% ml_bisecting_kmeans(formula=formula, k = k, max_iter = 10)
 }
 
-k_errors <- numeric(5)
-for(i in 2:5) {
+k_errors <- numeric(10)
+for(i in 2:10) {
   k_errors[i] <- clustered[[i]]$cost
 }
-k_errors_df <- data.frame(i=1:5, e=k_errors)
+k_errors_df <- data.frame(i=1:10, e=k_errors)
 
 k_elbow_plot <- ggplot(k_errors_df) +
   geom_line(mapping = aes(x = i, y = e)) +
-  labs(title = "Sum of squared errors over number of clusters",
-       x = "Number of clusters",
-       y = "Sum of squared errors ") +
-  theme_bw() +
+  scale_x_continuous(breaks = 1:10) +
+  labs(title = "Suma gresaka kvadrata prema broju klastera",
+       x = "Broj klastera",
+       y = "Suma gresaka") +
+  theme_bw() 
 ggsave("images/kElbowPlot.png", k_elbow_plot)
 ```
-![Sum of squared errors over number of clusters](images/kElbowPlot.png)
-Pregledanjem grafika, velike promene se dešavaju na k=2 i k=4, čime su izabrane 
+![Suma gresaka](images/kElbowPlot.png)
+Pregledanjem grafika, velike promene se dešavaju na k=4 i k=7, čime su izabrane 
 za parametre.
 
 ### Obučavanje
-Za obučavanje su odabrani modeli sa k=2 i k=4.
-```{r Obučavanje, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+Za obučavanje su odabrani modeli sa k=4 i k=7.
+```{r Obučavanje, message=FALSE, warning=FALSE, error=FALSE}
 kmeans_models <- list()
 kmeans_predictions <- list()
 smp <- c(1:2)
+ks <- c(4,7)
 for(i in smp) {
-    kmeans_models[[i]] <- ml_bisecting_kmeans(x=cp, formula=formula, k = i*2)
-    kmeans_predictions[[i]] <- ml_predict(kmeans_models[[i]], features=cluster_data)
+    kmeans_models[[i]] <- features %>% ml_bisecting_kmeans(formula=formula, k = ks[[i]])
+    kmeans_predictions[[i]] <- ml_predict(kmeans_models[[i]], features)
 }
+
+kmeans_models[[1]]
+kmeans_models[[2]]
 ```
-### Prikaz klastera
+### Prikaz odnosa obeležja i pripadnosti klasterima
 ```{r Prikaz klastera, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-p <- kmeans_predictions[[2]] %>%
-        ggplot(aes(total_amount, tip_amount, color=as.factor(prediction))) +
-        geom_point() +
-        labs(title = paste("K-means clustering with k =", i),
-             x = "Total amount",
-             y = "Tip amount")
-            
-ggsave(paste0("images/kmeans", i, ".png"), p)
-
-kmeans_models[[2]] <- kmeans_models[[4]]
-predictions <- list()
 for(i in smp) {
-    kmeans_models[[i]]
+    tmp <- kmeans_predictions[[i]] %>% select(trip_distance, prediction) %>% collect()
+    png(paste0("images/kmeans_trip_distance_", ks[[i]], ".png"), width = 800, height = 1200)
+    boxplot(trip_distance ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Dužina putovanja")
+    dev.off()
 
+    tmp <- kmeans_predictions[[i]] %>% select(total_amount, prediction) %>% collect()
+    png(paste0("images/kmeans_total_amount_", ks[[i]], ".png"), width = 800, height = 1200)
+    boxplot(total_amount ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Potpuna cena")
+    dev.off()
+
+    tmp <- kmeans_predictions[[i]] %>% select(tip_amount, prediction) %>% collect()
+    png(paste0("images/kmeans_tip_amount_", ks[[i]], ".png"), width = 800, height = 1200)
+    boxplot(tip_amount ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Napojnica")
+    dev.off()
+
+    tmp <- kmeans_predictions[[i]] %>% select(fare_amount, prediction) %>% collect()
+    png(paste0("images/kmeans_fare_amount_", ks[[i]], ".png"), width = 800, height = 1200)
+    boxplot(fare_amount ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Cena vožnje")
+    dev.off()
 }
+
 ```
-![K-means klaster sa k=2](images/kmeans2.png)
-![K-means klaster sa k=4](images/kmeans4.png)
+![K-means klaster sa k=4 odnos trip_distance i klastera](images/kmeans_trip_distance_4.png)
+![K-means klaster sa k=4 odnos total_amount i klastera](images/kmeans_total_amount_4.png)
+![K-means klaster sa k=4 odnos tip_amount i klastera](images/kmeans_tip_amount_4.png)
+![K-means klaster sa k=4 odnos fare_amount i klastera](images/kmeans_fare_amount_4.png)
+![K-means klaster sa k=7 odnos trip_distance i klastera](images/kmeans_trip_distance_7.png)
+![K-means klaster sa k=7 odnos total_amount i klastera](images/kmeans_total_amount_7.png)
+![K-means klaster sa k=7 odnos tip_amount i klastera](images/kmeans_tip_amount_7.png)
+![K-means klaster sa k=7 odnos fare_amount i klastera](images/kmeans_fare_amount_7.png)
