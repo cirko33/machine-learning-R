@@ -762,15 +762,24 @@ clearFn()
 # Klasifikacija
 ## Priprema podataka
 ```{r Priprema podataka, message=FALSE, warning=FALSE, error=FALSE}
-data_splitted <- sdf_random_split(data, training=0.9, test = 0.1, seed = 1)
+split_data <- sdf_random_split(data, training = 0.9, test = 0.1, seed = 1)
 ```
-## Ciljno obeležje i prediktori
+### Ciljno obeležje i prediktori
 ```{r Ciljno obeležje i prediktori, message=FALSE, warning=FALSE, error=FALSE}
 predictor <- tip_status ~ trip_distance + fare_amount + tolls_amount + total_amount + passenger_count + payment_type
 ```
+### Funkcija za čišćenje memorije
+```{r Funkcija za čišćenje memorije, results='hide', message=FALSE, warning=FALSE, error=FALSE}
+clearFn1 <- function() {
+    all_objects <- ls()
+    needed_to_keep <- c("sc", "ds.df", "ds.filtered", "data", "conf", "clearFn1", "split_data", "predictor")
+    to_remove <- setdiff(all_objects, needed_to_keep)
+    rm(list = to_remove)
+}
+```
 ## Logistička regresija
 ### Obučavanje i evaluacija modela
-```{r Logistička regresija, message=FALSE, warning=FALSE, error=FALSE}
+```{r Logistička regresija, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 smp <- c(1:3)
 max.iter <- smp * 5
 
@@ -780,8 +789,8 @@ log.fmeasure <- smp
 log.accuracy <- smp
 
 for(i in smp){
-    model <- ml_logistic_regression(data_splitted$train, predictor, max_iter=max.iter[[i]])
-    eval <- ml_evaluate(model, data_splitted$test)
+    model <- ml_logistic_regression(split_data$train, predictor, max_iter=max.iter[[i]])
+    eval <- ml_evaluate(model, split_data$test)
     log.precision[i] <- eval$weighted_precision()
     log.recall[i] <- eval$weighted_recall()
     log.fmeasure[i] <- eval$weighted_f_measure()
@@ -790,7 +799,7 @@ for(i in smp){
 ```
 ### Prikaz zavisnosti
 ```{r Prikaz zavisnosti, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-logistic_metrics <- data.frame(i=max.iter, wp=log.precision, wr=log.recall, wf=log.fmeasure, roc=log.roc, acc=log.accuracy)
+logistic_metrics <- data.frame(i=max.iter, wp=log.precision, wr=log.recall, wf=log.fmeasure, acc=log.accuracy)
 plots <- list()
 
 p1 <- logistic_metrics %>%
@@ -800,7 +809,6 @@ ggplot(aes(i, wp, color=wp)) +
   scale_y_continuous(breaks=log.precision) +
   labs(x="Maksimalni broj iteracija", y="Preciznost", title = "Zavisnost preciznosti od maksimalnog broja iteracija")
 ggsave("images/logPrecIter.png", p1)
-
 
 p2 <- logistic_metrics %>%
 ggplot(aes(i, wr, color=wr)) +
@@ -817,48 +825,152 @@ p3 <- logistic_metrics %>%
   scale_y_continuous(breaks=log.fmeasure) +
   labs(x="Maksimalni broj iteracija", y="F1", title = "Zavisnost F1 mere od maksimalnog broja iteracija")
 ggsave("images/logF1Iter.png", p3)
+
+p4 <- logistic_metrics %>%
+  ggplot(aes(i, acc, color=acc)) +
+  geom_line(size=2) +
+  scale_x_continuous(breaks=max.iter) +
+  scale_y_continuous(breaks=log.accuracy) +
+  labs(x="Maksimalni broj iteracija", y="Tacnost", title = "Zavisnost tacnosti od maksimalnog broja iteracija")
+ggsave("images/logAccIter.png", p4)
 ```
 ![Zavisnost preciznosti od maksimalnog broja iteracija](images/logPrecIter.png)
 ![Zavisnost osetljivosti od maksimalnog broja iteracija](images/logRecIter.png)
 ![Zavisnost F1 mere od maksimalnog broja iteracija](images/logF1Iter.png)
+![Zavisnost tacnosti od maksimalnog broja iteracija](images/logAccIter.png)
+
 ### Validacija
-```{r Validacija, message=FALSE, warning=FALSE, error=FALSE}
-tbl_data <- copy_to(sc, data, "tbl_data", overwrite = TRUE)
-
-pip <- tbl_data %>%
+```{r Validacija, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+pip <- sc %>% 
     ml_pipeline() %>%
-    ml_logistic_regression(predictor)
+    ft_r_formula(predictor) %>%
+    ml_logistic_regression()
 
-evl <- ml_multiclass_classification_evaluator(x = tbl_data, metric_name = "f1")
-param_grid = list(logistic_regression=list(max_iter(5, 10, 5)))
-validation <- ml_cross_validator(tbl_data, pip, param_grid, evl)
+param_grid <- list(
+  logistic_regression = list(max_iter = max.iter)
+)
 
-cv <- ml_fit(validation, tbl_data)
-metrics <- ml_validation_metrics(cv)
-p <- ggplot(metrics, aes(x=max_iter, y=f1)) +
-  geom_line() +
-  theme_minimal()
+evaluator <- ml_multiclass_classification_evaluator(x=sc, metric_name="accuracy")
+validator <- ml_cross_validator(x=sc, estimator=pip, evaluator=evaluator, estimator_param_maps=param_grid, num_folds=4)
+fit <- ml_fit(x=validator, dataset=data)
+metrics <- ml_validation_metrics(fit)
 
-ggsave("images/logValidation.png", p)
+p <- metrics %>% 
+  ggplot(aes(max.iter, accuracy)) + 
+  geom_line()
+
+ggsave("images/logKFolds.png", p)
+clearFn1()
 ```
-![Validacija](images/logValidation.png)
-## Mašina potpornih vektora
-```{r Mašina potpornih vektora, message=FALSE, warning=FALSE, error=FALSE}
-svm_models <- list()
-svm_evaluations <- list()
-
-for(i in 1:models_num){
-    svm_models[[i]] <- ml_linear_svc(data_splitted$train, models[[i]])
-    svm_evaluations[[i]] <- ml_evaluate(svm_models[[i]], data_splitted$test)
-}
-```
+![K-folds validacija tacnost logisticka regresija](images/logKFolds.png)
 ## Stablo odlučivanja
-```{r Stablo odlučivanja, message=FALSE, warning=FALSE, error=FALSE}
-dt_models <- list()
-dt_evaluations <- list()
+### Obučavanje i evaluacija modela
+```{r Stablo odlučivanja, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+smp <- c(1:3)
+max.depth <- smp * 5
 
-for(i in 1:models_num){
-    dt_models[[i]] <- ml_decision_tree_classifier(data_splitted$train, models[[i]])
-    dt_evaluations[[i]] <- ml_evaluate(dt_models[[i]], data_splitted$test)
+dt.accuracy <- smp
+
+for(i in smp){
+    model <- ml_decision_tree(split_data$train, predictor, max_depth=max.depth[[i]])
+    eval <- ml_evaluate(model, split_data$test)
+
+    dt.accuracy[i] <- eval$Accuracy
 }
 ```
+### Prikaz zavisnosti
+```{r Prikaz zavisnosti, eval=FALSE, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+decision_tree_metrics <- data.frame(i=max.depth, acc=dt.accuracy)
+plots <- list()
+
+p <- decision_tree_metrics %>%
+  ggplot(aes(i, acc, color=acc)) +
+  geom_line(size=2) +
+  scale_x_continuous(breaks=max.iter) +
+  scale_y_continuous(breaks=log.accuracy) +
+  labs(x="Maksimalna dubina stabla", y="Tacnost", title = "Zavisnost tacnosti od maksimalnog broja iteracija")
+
+ggsave("images/dtAccDepth.png", p)
+```
+![Zavisnost preciznosti od maksimalne dubine](images/dtAccDepth.png)
+### Validacija
+```{r Validacija, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+pip <- sc %>% 
+    ml_pipeline() %>%
+    ft_r_formula(predictor) %>%
+    ml_decision_tree_classifier()
+
+param_grid <- list(
+  decision_tree_classifier = list(max_depth = max.depth)
+)
+
+evaluator <- ml_multiclass_classification_evaluator(x=sc, metric_name="accuracy")
+validator <- ml_cross_validator(x=sc, estimator=pip, evaluator=evaluator, estimator_param_maps=param_grid, num_folds=4)
+fit <- ml_fit(x=validator, dataset=data)
+metrics <- ml_validation_metrics(fit)
+
+p <- metrics %>% 
+  ggplot(aes(max.depth, accuracy)) + 
+  geom_line()
+
+ggsave("images/dtKFolds.png", p)
+clearFn1()
+```
+![K-folds validacija tacnost stablo odlucivanja](images/dtKFolds.png)
+## Random forest
+### Obučavanje i evaluacija modela
+```{r Random forest, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+smp <- c(1:3)
+num.trees <- smp * 5
+
+rf.accuracy <- smp
+
+for(i in smp){
+    model <- ml_random_forest(split_data$train, predictor, num_trees=num.trees[[i]])
+    eval <- ml_evaluate(model, split_data$test)
+
+    rf.accuracy[i] <- eval$Accuracy
+}
+```
+### Prikaz zavisnosti
+```{r Prikaz zavisnosti, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+random_forest_metrics <- data.frame(i=num.trees, acc=rf.accuracy)
+plots <- list()
+
+p <- random_forest_metrics %>%
+  ggplot(aes(i, acc, color=acc)) +
+  geom_line(size=2) +
+  scale_x_continuous(breaks=num.trees) +
+  scale_y_continuous(breaks=rf.accuracy) +
+  labs(x="Broj stabala", y="Tacnost", title = "Zavisnost tacnosti od broja stabala")
+
+ggsave("images/rfAccTrees.png", p)
+```
+![Zavisnost tacnosti od broja stabala](images/rfAccTrees.png)
+
+### Validacija
+```{r Validacija, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+pip <- sc %>% 
+    ml_pipeline() %>%
+    ft_r_formula(predictor) %>%
+    ml_random_forest_classifier()
+
+param_grid <- list(
+    random_forest_classifier = list(num_trees = num.trees)
+    )
+
+evaluator <- ml_multiclass_classification_evaluator(x=sc, metric_name="accuracy")
+validator <- ml_cross_validator(x=sc, estimator=pip, evaluator=evaluator, estimator_param_maps=param_grid, num_folds=4)
+fit <- ml_fit(x=validator, dataset=data)
+metrics <- ml_validation_metrics(fit)
+
+p <- metrics %>% 
+  ggplot(aes(num.trees, accuracy)) + 
+  geom_line()
+
+ggsave("images/rfKFolds.png", p)
+clearFn1()
+```
+![K-folds validacija tacnost random forest](images/rfKFolds.png)
+
+## Zaključak
