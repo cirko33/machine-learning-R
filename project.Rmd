@@ -766,13 +766,13 @@ split_data <- sdf_random_split(data, training = 0.9, test = 0.1, seed = 1)
 ```
 ### Ciljno obeležje i prediktori
 ```{r Ciljno obeležje i prediktori, message=FALSE, warning=FALSE, error=FALSE}
-predictor <- tip_status ~ trip_distance + fare_amount + tolls_amount + total_amount + passenger_count + payment_type
+formula <- tip_status ~ trip_distance + fare_amount + tolls_amount + total_amount + passenger_count + payment_type
 ```
 ### Funkcija za čišćenje memorije
 ```{r Funkcija za čišćenje memorije, results='hide', message=FALSE, warning=FALSE, error=FALSE}
 clearFn1 <- function() {
     all_objects <- ls()
-    needed_to_keep <- c("sc", "ds.df", "ds.filtered", "data", "conf", "clearFn1", "split_data", "predictor")
+    needed_to_keep <- c("sc", "ds.df", "ds.filtered", "data", "conf", "clearFn1", "split_data", "formula")
     to_remove <- setdiff(all_objects, needed_to_keep)
     rm(list = to_remove)
 }
@@ -789,7 +789,7 @@ log.fmeasure <- smp
 log.accuracy <- smp
 
 for(i in smp){
-    model <- ml_logistic_regression(split_data$train, predictor, max_iter=max.iter[[i]])
+    model <- ml_logistic_regression(split_data$train, formula, max_iter=max.iter[[i]])
     eval <- ml_evaluate(model, split_data$test)
     log.precision[i] <- eval$weighted_precision()
     log.recall[i] <- eval$weighted_recall()
@@ -842,7 +842,7 @@ ggsave("images/logAccIter.png", p4)
 ```{r Validacija, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pip <- sc %>% 
     ml_pipeline() %>%
-    ft_r_formula(predictor) %>%
+    ft_r_formula(formula) %>%
     ml_logistic_regression()
 
 param_grid <- list(
@@ -874,9 +874,11 @@ smp <- c(1:3)
 max.depth <- smp * 5
 
 dt.accuracy <- smp
+dt.sensitivity <- smp
+dt.fmeasure <- smp
 
 for(i in smp){
-    model <- ml_decision_tree_classifier(split_data$train, predictor, max_depth=max.depth[[i]])
+    model <- ml_decision_tree_classifier(split_data$train, formula, max_depth=max.depth[[i]])
     eval <- ml_evaluate(model, split_data$test)
 
     dt.accuracy[i] <- eval$Accuracy
@@ -889,9 +891,9 @@ decision_tree_metrics <- data.frame(i=max.depth, acc=dt.accuracy)
 p <- decision_tree_metrics %>%
   ggplot(aes(i, acc, color=acc)) +
   geom_line(size=2) +
-  scale_x_continuous(breaks=max.iter) +
+  scale_x_continuous(breaks=max.depth) +
   scale_y_continuous(breaks=log.accuracy) +
-  labs(x="Maksimalna dubina stabla", y="Tacnost", title = "Zavisnost tacnosti od maksimalnog broja iteracija")
+  labs(x="Maksimalna dubina stabla", y="Tacnost", title = "Zavisnost tacnosti od maksimalnog dubine stabla")
 
 ggsave("images/dtAccDepth.png", p)
 ```
@@ -900,7 +902,7 @@ ggsave("images/dtAccDepth.png", p)
 ```{r Validacija, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pip <- sc %>% 
     ml_pipeline() %>%
-    ft_r_formula(predictor) %>%
+    ft_r_formula(formula) %>%
     ml_decision_tree_classifier()
 
 param_grid <- list(
@@ -934,7 +936,7 @@ num.trees <- smp * 5
 rf.accuracy <- smp
 
 for(i in smp){
-    model <- ml_random_forest_classifier(split_data$train, predictor, num_trees=num.trees[[i]])
+    model <- ml_random_forest_classifier(split_data$train, formula, num_trees=num.trees[[i]])
     eval <- ml_evaluate(model, split_data$test)
 
     rf.accuracy[i] <- eval$Accuracy
@@ -959,7 +961,7 @@ ggsave("images/rfAccTrees.png", p)
 ```{r Validacija, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pip <- sc %>% 
     ml_pipeline() %>%
-    ft_r_formula(predictor) %>%
+    ft_r_formula(formula) %>%
     ml_random_forest_classifier()
 
 param_grid <- list(
@@ -985,4 +987,77 @@ i najbolju tačnost prilikom k-fold unakrsnog validiranja sa k=4.
 Time, biramo model sa 5 stabala.
 
 # Klasterizacija
+## Priprema podataka
+```{r Priprema podataka, message=FALSE, warning=FALSE, error=FALSE}
+cluster_data <- data %>%
+    select(total_amount, tip_amount, trip_distance, fare_amount)
+formula <- trip_distance ~ total_amount + tip_amount + fare_amount
+cp <- copy_to(sc, cluster_data, "cd", overwrite = TRUE)
+```
+### Funkcija za čišćenje memorije
+```{r Funkcija za čišćenje memorije, results='hide', message=FALSE, warning=FALSE, error=FALSE}
+clearFn2 <- function() {
+    all_objects <- ls()
+    needed_to_keep <- c("sc", "ds.df", "ds.filtered", "data", "conf", "clearFn2", "cluster_data")
+    to_remove <- setdiff(all_objects, needed_to_keep)
+    rm(list = to_remove)
+}
+```
 
+## K-means
+### Biranje K
+```{r Biranje K, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+clustered <- list()
+for(k in 2:5) {
+  clustered[[k]] <- ml_bisecting_kmeans(x=cp, formula=formula, k = k, max_iter = 10)
+}
+
+k_errors <- numeric(5)
+for(i in 2:5) {
+  k_errors[i] <- clustered[[i]]$cost
+}
+k_errors_df <- data.frame(i=1:5, e=k_errors)
+
+k_elbow_plot <- ggplot(k_errors_df) +
+  geom_line(mapping = aes(x = i, y = e)) +
+  labs(title = "Sum of squared errors over number of clusters",
+       x = "Number of clusters",
+       y = "Sum of squared errors ") +
+  theme_bw() +
+ggsave("images/kElbowPlot.png", k_elbow_plot)
+```
+![Sum of squared errors over number of clusters](images/kElbowPlot.png)
+Pregledanjem grafika, velike promene se dešavaju na k=2 i k=4, čime su izabrane 
+za parametre.
+
+### Obučavanje
+Za obučavanje su odabrani modeli sa k=2 i k=4.
+```{r Obučavanje, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+kmeans_models <- list()
+kmeans_predictions <- list()
+smp <- c(1:2)
+for(i in smp) {
+    kmeans_models[[i]] <- ml_bisecting_kmeans(x=cp, formula=formula, k = i*2)
+    kmeans_predictions[[i]] <- ml_predict(kmeans_models[[i]], features=cluster_data)
+}
+```
+### Prikaz klastera
+```{r Prikaz klastera, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+p <- kmeans_predictions[[2]] %>%
+        ggplot(aes(total_amount, tip_amount, color=as.factor(prediction))) +
+        geom_point() +
+        labs(title = paste("K-means clustering with k =", i),
+             x = "Total amount",
+             y = "Tip amount")
+            
+ggsave(paste0("images/kmeans", i, ".png"), p)
+
+kmeans_models[[2]] <- kmeans_models[[4]]
+predictions <- list()
+for(i in smp) {
+    kmeans_models[[i]]
+
+}
+```
+![K-means klaster sa k=2](images/kmeans2.png)
+![K-means klaster sa k=4](images/kmeans4.png)
