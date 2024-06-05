@@ -876,7 +876,7 @@ max.depth <- smp * 5
 dt.accuracy <- smp
 
 for(i in smp){
-    model <- ml_decision_tree(split_data$train, predictor, max_depth=max.depth[[i]])
+    model <- ml_decision_tree_classifier(split_data$train, predictor, max_depth=max.depth[[i]])
     eval <- ml_evaluate(model, split_data$test)
 
     dt.accuracy[i] <- eval$Accuracy
@@ -934,7 +934,7 @@ num.trees <- smp * 5
 rf.accuracy <- smp
 
 for(i in smp){
-    model <- ml_random_forest(split_data$train, predictor, num_trees=num.trees[[i]])
+    model <- ml_random_forest_classifier(split_data$train, predictor, num_trees=num.trees[[i]])
     eval <- ml_evaluate(model, split_data$test)
 
     rf.accuracy[i] <- eval$Accuracy
