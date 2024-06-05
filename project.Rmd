@@ -57,6 +57,7 @@ if __name__ == "__main__":
     
 ```
 # Implementacija
+Implementacija radjena u **R** programskom jeziku, korišćenjem **R Markdown** dokumenta.
 ## Instalacija
 ### Instalacija paketa
 ```{r Instalacija paketa, results='hide', eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
@@ -66,6 +67,7 @@ install.packages("rmarkdown")
 install.packages("knitr")
 install.packages("pandoc")
 install.packages("dbplot")
+install.packages("ggcorrplot")
 ```
 ### Učitavanje paketa
 ```{r Učitavanje paketa, results='hide', message=FALSE, warning=FALSE, error=FALSE}
@@ -74,6 +76,7 @@ library(dplyr)
 library(knitr)
 library(rmarkdown)
 library(ggplot2)
+library(ggcorrplot)
 library(dbplot)
 library(pandoc)
 spark_install()
@@ -759,10 +762,45 @@ clearFn()
 ```
 ![Ukupna cena po načinu plaćanja](images/totalAmountTipStatus.png)
 
+### Matrica korelacije
+```{r korelaciona-matrica-obelezja, eval=FALSE, include=TRUE}
+local_df <- data %>% 
+    select(-tip_status) %>%
+  sdf_sample(fraction = 0.8, replacement = FALSE, seed=1) %>%
+  collect()
+
+mt <- cor(cor(local_df))
+
+p <- ggcorrplot(mt, 
+        hc.order = TRUE,
+        type = "lower",
+        lab = TRUE, 
+        ggtheme = ggplot2::theme_gray,
+        colors = c("#123456", "white", "#654321"))
+
+ggsave("images/MatricaKorelacije.png", p)
+clearFn()
+```
+![Matrica korelacije](images/MatricaKorelacije.png)
+
 # Klasifikacija
 ## Priprema podataka
 ```{r Priprema podataka 1, message=FALSE, warning=FALSE, error=FALSE}
-split_data <- sdf_random_split(data, training = 0.9, test = 0.1, seed = 1)
+means <- data %>%
+    summarise_all(mean) %>%
+    collect()
+
+sds <- data %>%
+    summarise_all(sd) %>%
+    collect()
+ 
+standardized_data <- data %>%
+    mutate(trip_distance = (trip_distance - means$trip_distance) / sds$trip_distance,
+           fare_amount = (fare_amount - means$fare_amount) / sds$fare_amount,
+           tolls_amount = (tolls_amount - means$tolls_amount) / sds$tolls_amount,
+           total_amount = (total_amount - means$total_amount) / sds$total_amount)
+
+split_data <- sdf_random_split(standardized_data, training = 0.8, test = 0.2, seed = 1)
 ```
 ### Ciljno obeležje i prediktori
 ```{r Ciljno obeležje i prediktori, message=FALSE, warning=FALSE, error=FALSE}
@@ -770,16 +808,16 @@ formula <- tip_status ~ trip_distance + fare_amount + tolls_amount + total_amoun
 ```
 ### Funkcija za čišćenje memorije
 ```{r Funkcija za čišćenje memorije 2, results='hide', message=FALSE, warning=FALSE, error=FALSE}
-clearFn1 <- function() {
+clearFn <- function() {
     all_objects <- ls()
-    needed_to_keep <- c("sc", "ds.df", "ds.filtered", "data", "conf", "clearFn1", "split_data", "formula")
+    needed_to_keep <- c("sc", "ds.df", "ds.filtered", "data", "conf", "clearFn", "split_data", "formula", "standardized_data")
     to_remove <- setdiff(all_objects, needed_to_keep)
     rm(list = to_remove)
 }
 ```
 ## Logistička regresija
 ### Obučavanje i evaluacija modela
-```{r Logistička regresija, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Logistička regresija, message=FALSE, warning=FALSE, error=FALSE}
 smp <- c(1:3)
 max.iter <- smp * 5
 
@@ -798,7 +836,7 @@ for(i in smp){
 }
 ```
 ### Prikaz zavisnosti
-```{r Prikaz zavisnosti 1, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Prikaz zavisnosti 1, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 logistic_metrics <- data.frame(i=max.iter, wp=log.precision, wr=log.recall, wf=log.fmeasure, acc=log.accuracy)
 
 p1 <- logistic_metrics %>%
@@ -839,7 +877,7 @@ ggsave("images/logAccIter.png", p4)
 ![Zavisnost tacnosti od maksimalnog broja iteracija](images/logAccIter.png)
 
 ### Validacija
-```{r Validacija 1, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Validacija 1, message=FALSE, warning=FALSE, error=FALSE}
 pip <- sc %>% 
     ml_pipeline() %>%
     ft_r_formula(formula) %>%
@@ -851,7 +889,7 @@ param_grid <- list(
 
 evaluator <- ml_multiclass_classification_evaluator(x=sc, metric_name="accuracy")
 validator <- ml_cross_validator(x=sc, estimator=pip, evaluator=evaluator, estimator_param_maps=param_grid, num_folds=4)
-fit <- ml_fit(x=validator, dataset=data)
+fit <- ml_fit(x=validator, dataset=standardized_data)
 metrics <- ml_validation_metrics(fit)
 
 p <- metrics %>% 
@@ -859,7 +897,7 @@ p <- metrics %>%
   geom_line()
 
 ggsave("images/logKFolds.png", p)
-clearFn1()
+clearFn()
 ```
 ![K-folds validacija tacnost logisticka regresija](images/logKFolds.png)
 ### Odabir modela
@@ -869,7 +907,7 @@ Time, biramo model sa 15 iteracija.
 
 ## Stablo odlučivanja
 ### Obučavanje i evaluacija modela
-```{r Stablo odlučivanja, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Stablo odlučivanja, message=FALSE, warning=FALSE, error=FALSE}
 smp <- c(1:3)
 max.depth <- smp * 5
 
@@ -885,7 +923,7 @@ for(i in smp){
 }
 ```
 ### Prikaz zavisnosti
-```{r Prikaz zavisnosti 2, eval=FALSE, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Prikaz zavisnosti 2, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 decision_tree_metrics <- data.frame(i=max.depth, acc=dt.accuracy)
 
 p <- decision_tree_metrics %>%
@@ -899,7 +937,7 @@ ggsave("images/dtAccDepth.png", p)
 ```
 ![Zavisnost preciznosti od maksimalne dubine](images/dtAccDepth.png)
 ### Validacija
-```{r Validacija 2, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Validacija 2, message=FALSE, warning=FALSE, error=FALSE}
 pip <- sc %>% 
     ml_pipeline() %>%
     ft_r_formula(formula) %>%
@@ -911,7 +949,7 @@ param_grid <- list(
 
 evaluator <- ml_multiclass_classification_evaluator(x=sc, metric_name="accuracy")
 validator <- ml_cross_validator(x=sc, estimator=pip, evaluator=evaluator, estimator_param_maps=param_grid, num_folds=4)
-fit <- ml_fit(x=validator, dataset=data)
+fit <- ml_fit(x=validator, dataset=standardized_data)
 metrics <- ml_validation_metrics(fit)
 
 p <- metrics %>% 
@@ -919,7 +957,7 @@ p <- metrics %>%
   geom_line()
 
 ggsave("images/dtKFolds.png", p)
-clearFn1()
+clearFn()
 ```
 ![K-folds validacija tacnost stablo odlucivanja](images/dtKFolds.png)
 ### Odabir modela
@@ -929,7 +967,7 @@ Time, biramo model sa maksimalnom dubinom stabla od 15.
 
 ## Random forest
 ### Obučavanje i evaluacija modela
-```{r Random forest, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Random forest, message=FALSE, warning=FALSE, error=FALSE}
 smp <- c(1:3)
 num.trees <- smp * 5
 
@@ -943,7 +981,7 @@ for(i in smp){
 }
 ```
 ### Prikaz zavisnosti
-```{r Prikaz zavisnosti 3, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Prikaz zavisnosti 3, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 random_forest_metrics <- data.frame(i=num.trees, acc=rf.accuracy)
 
 p <- random_forest_metrics %>%
@@ -958,7 +996,7 @@ ggsave("images/rfAccTrees.png", p)
 ![Zavisnost tacnosti od broja stabala](images/rfAccTrees.png)
 
 ### Validacija
-```{r Validacija 3, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Validacija 3, message=FALSE, warning=FALSE, error=FALSE}
 pip <- sc %>% 
     ml_pipeline() %>%
     ft_r_formula(formula) %>%
@@ -970,7 +1008,7 @@ param_grid <- list(
 
 evaluator <- ml_multiclass_classification_evaluator(x=sc, metric_name="accuracy")
 validator <- ml_cross_validator(x=sc, estimator=pip, evaluator=evaluator, estimator_param_maps=param_grid, num_folds=4)
-fit <- ml_fit(x=validator, dataset=data)
+fit <- ml_fit(x=validator, dataset=standardized_data)
 metrics <- ml_validation_metrics(fit)
 
 p <- metrics %>% 
@@ -978,7 +1016,7 @@ p <- metrics %>%
   geom_line()
 
 ggsave("images/rfKFolds.png", p)
-clearFn1()
+clearFn()
 ```
 ![K-folds validacija tacnost random forest](images/rfKFolds.png)
 ### Odabir modela
@@ -989,15 +1027,15 @@ Time, biramo model sa 5 stabala.
 # Klasterizacija
 ## Priprema podataka
 ```{r Priprema podataka 2, message=FALSE, warning=FALSE, error=FALSE}
-features <- data %>%
-    select(total_amount, tip_amount, trip_distance, fare_amount)
-formula <- trip_distance ~ total_amount + tip_amount + fare_amount
+features <- standardized_data %>%
+    select(total_amount, passenger_count, payment_type)
+formula <- ~ total_amount + passenger_count + payment_type
 ```
 ### Funkcija za čišćenje memorije
 ```{r Funkcija za čišćenje memorije 3, results='hide', message=FALSE, warning=FALSE, error=FALSE}
-clearFn2 <- function() {
+clearFn <- function() {
     all_objects <- ls()
-    needed_to_keep <- c("sc", "ds.df", "ds.filtered", "data", "conf", "clearFn2", "cluster_data")
+    needed_to_keep <- c("sc", "ds.df", "ds.filtered", "data", "conf", "clearFn", "features", "standardized_data")
     to_remove <- setdiff(all_objects, needed_to_keep)
     rm(list = to_remove)
 }
@@ -1005,7 +1043,7 @@ clearFn2 <- function() {
 
 ## K-means
 ### Biranje K
-```{r Biranje K, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Biranje K, message=FALSE, eval=FALSE, warning=FALSE, error=FALSE}
 clustered <- list()
 for(k in 2:10) {
   clustered[[k]] <- features %>% ml_bisecting_kmeans(formula=formula, k = k, max_iter = 10)
@@ -1025,6 +1063,7 @@ k_elbow_plot <- ggplot(k_errors_df) +
        y = "Suma gresaka") +
   theme_bw() 
 ggsave("images/kElbowPlot.png", k_elbow_plot)
+clearFn()
 ```
 ![Suma gresaka](images/kElbowPlot.png)
 Pregledanjem grafika, velike promene se dešavaju na k=4 i k=7, čime su izabrane 
@@ -1036,7 +1075,7 @@ Za obučavanje su odabrani modeli sa k=4 i k=7.
 kmeans_models <- list()
 kmeans_predictions <- list()
 smp <- c(1:2)
-ks <- c(4,7)
+ks <- c(4,6)
 for(i in smp) {
     kmeans_models[[i]] <- features %>% ml_bisecting_kmeans(formula=formula, k = ks[[i]])
     kmeans_predictions[[i]] <- ml_predict(kmeans_models[[i]], features)
@@ -1045,36 +1084,59 @@ for(i in smp) {
 kmeans_models[[1]]
 kmeans_models[[2]]
 ```
-### Prikaz odnosa obeležja i pripadnosti klasterima
-```{r Prikaz klastera, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+
+### Izračunavanje struktura klastera
+```{r Izračunavanje struktura klastera, message=FALSE, warning=FALSE, error=FALSE}
+kmeans.means <- list()
+kmeans.medians <- list()
+kmeans.counts <- list()
+
 for(i in smp) {
-    tmp <- kmeans_predictions[[i]] %>% select(trip_distance, prediction) %>% collect()
-    png(paste0("images/kmeans_trip_distance_", ks[[i]], ".png"), width = 800, height = 1200)
-    boxplot(trip_distance ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Dužina putovanja")
+    kmeans.means[[i]] <- kmeans_predictions[[i]] %>% select(-features, -payment_type) %>% group_by(prediction) %>% summarise_all(mean) %>% arrange(prediction) %>% collect()
+    kmeans.medians[[i]] <- kmeans_predictions[[i]] %>% select(-features, -payment_type) %>% group_by(prediction) %>% summarise_all(median) %>% arrange(prediction) %>% collect()
+    kmeans.counts[[i]] <- kmeans_predictions[[i]] %>% select(-features) %>% group_by(prediction) %>% summarise(count = n()) %>% arrange(prediction) %>% collect()
+}
+
+kable(kmeans.means[[1]], caption=paste0("K-means aritmeticke sredine sa k=", ks[[1]]))
+kable(kmeans.medians[[1]], caption=paste0("K-means medijane sa k=", ks[[1]]))
+kable(kmeans.counts[[1]], caption=paste0("K-means broj sa k=", ks[[1]]))
+kable(kmeans.means[[2]], caption=paste0("K-means aritmeticke sredine sa k=", ks[[2]]))
+kable(kmeans.medians[[2]], caption=paste0("K-means medijane sa k=", ks[[2]]))
+kable(kmeans.counts[[2]], caption=paste0("K-means broj sa k=", ks[[2]]))
+clearFn()
+```
+### Prikaz odnosa obeležja i pripadnosti klasterima
+```{r Prikaz klastera, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+means <- data %>%
+    summarise(total_amount=mean(total_amount)) %>%
+    collect()
+
+sds <- data %>%
+    summarise(total_amount=sd(total_amount)) %>%
+    collect()
+
+for(i in smp) {
+    tmp <- kmeans_predictions[[i]] %>% select(payment_type, prediction) %>% collect()
+    png(paste0("images/kmeans_payment_type_", ks[[i]], ".png"), width = 800, height = 1200)
+    boxplot(payment_type ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Dužina putovanja")
     dev.off()
 
-    tmp <- kmeans_predictions[[i]] %>% select(total_amount, prediction) %>% collect()
+    tmp <- kmeans_predictions[[i]] %>% select(total_amount, prediction) %>% mutate(total_amount = total_amount * sds$total_amount + means$total_amount ) %>% collect()
     png(paste0("images/kmeans_total_amount_", ks[[i]], ".png"), width = 800, height = 1200)
     boxplot(total_amount ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Potpuna cena")
     dev.off()
 
-    tmp <- kmeans_predictions[[i]] %>% select(tip_amount, prediction) %>% collect()
-    png(paste0("images/kmeans_tip_amount_", ks[[i]], ".png"), width = 800, height = 1200)
-    boxplot(tip_amount ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Napojnica")
-    dev.off()
-
-    tmp <- kmeans_predictions[[i]] %>% select(fare_amount, prediction) %>% collect()
-    png(paste0("images/kmeans_fare_amount_", ks[[i]], ".png"), width = 800, height = 1200)
-    boxplot(fare_amount ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Cena vožnje")
+    tmp <- kmeans_predictions[[i]] %>% select(passenger_count, prediction) %>% collect()
+    png(paste0("images/kmeans_passenger_count_", ks[[i]], ".png"), width = 800, height = 1200)
+    boxplot(passenger_count ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Napojnica")
     dev.off()
 }
 
 ```
-![K-means klaster sa k=4 odnos trip_distance i klastera](images/kmeans_trip_distance_4.png)
+![K-means klaster sa k=4 odnos payment_type i klastera](images/kmeans_payment_type_4.png)
 ![K-means klaster sa k=4 odnos total_amount i klastera](images/kmeans_total_amount_4.png)
-![K-means klaster sa k=4 odnos tip_amount i klastera](images/kmeans_tip_amount_4.png)
-![K-means klaster sa k=4 odnos fare_amount i klastera](images/kmeans_fare_amount_4.png)
-![K-means klaster sa k=7 odnos trip_distance i klastera](images/kmeans_trip_distance_7.png)
-![K-means klaster sa k=7 odnos total_amount i klastera](images/kmeans_total_amount_7.png)
-![K-means klaster sa k=7 odnos tip_amount i klastera](images/kmeans_tip_amount_7.png)
-![K-means klaster sa k=7 odnos fare_amount i klastera](images/kmeans_fare_amount_7.png)
+![K-means klaster sa k=4 odnos passenger_count i klastera](images/kmeans_passenger_count_4.png)
+![K-means klaster sa k=6 odnos payment_type i klastera](images/kmeans_payment_type_6.png)
+![K-means klaster sa k=6 odnos total_amount i klastera](images/kmeans_total_amount_6.png)
+![K-means klaster sa k=6 odnos passenger_count i klastera](images/kmeans_passenger_count_6.png)
+
