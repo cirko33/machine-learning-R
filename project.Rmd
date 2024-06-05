@@ -146,7 +146,7 @@ kable(passengerCountCounts)
 ```{r Vizuelizacija atributa passenger_count, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 passengerCounts <- pull(data, passenger_count)
 
-png("images/passengerCountHistogram.png", width = 800, height = 1200)
+png("images/passengerCountHistogram.png", width = 300, height = 400)
 xgran <- pretty(passengerCounts, n = 10)
 xlabel <- seq(1, 8, 1)
 hst <- hist(passengerCounts, main = "Broj vožnji po broju putnika", xlab = "Broj putnika", ylab = "Broj vožnji")
@@ -168,7 +168,7 @@ kable(tripDistanceCounts)
 ```
 ```{r Vizuelizacija atributa trip_distance, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tripDistances <- pull(data, trip_distance)
-png("images/tripDistanceDensity.png", width = 800, height = 1200)
+png("images/tripDistanceDensity.png", width = 300, height = 400)
 plt <- plot(density(tripDistances), main = "Distribucija atributa trip_distance", xlab = "Dužina putovanja", ylab = "Gustina")
 dev.off()
 clearFn()
@@ -205,7 +205,7 @@ kable(fareAmountCounts)
 ```
 ```{r Vizuelizacija atributa fare_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 fareAmounts <- pull(data, fare_amount)
-png("images/fareAmountDensity.png", width = 800, height = 1200)
+png("images/fareAmountDensity.png", width = 300, height = 400)
 
 plt <- plot(density(fareAmounts), main = "Distribucija atributa fare_amount", xlab = "Cena vožnje", ylab = "Gustina", xlim = c(0, 100))
 
@@ -224,7 +224,7 @@ kable(tipAmountCounts)
 ```
 ```{r Vizuelizacija atributa tip_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tipAmounts <- pull(data, tip_amount)
-png("images/tipAmountDensity.png", width = 800, height = 1200)
+png("images/tipAmountDensity.png", width = 300, height = 400)
 plt <- plot(density(tipAmounts), main = "Distribucija atributa tip_amount", xlab = "Napojnica", ylab = "Gustina", xlim = c(0, 20))
 dev.off()
 clearFn()
@@ -241,7 +241,7 @@ kable(tollsAmountCounts)
 ```
 ```{r Vizuelizacija atributa tolls_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tollsAmounts <- pull(data, tolls_amount)
-png("images/tollsAmountDensity.png", width = 800, height = 1200)
+png("images/tollsAmountDensity.png", width = 300, height = 400)
 plt <- plot(density(tollsAmounts), main = "Distribucija atributa tolls_amount", xlab = "Troškovi putarine", ylab = "Gustina",  xlim = c(0, 20))
 dev.off()
 clearFn()
@@ -257,7 +257,7 @@ kable(totalAmountCounts)
 ```
 ```{r Vizuelizacija atributa total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 totalAmount <- pull(data, total_amount)
-png("images/totalAmountDensity.png", width = 800, height = 1200)
+png("images/totalAmountDensity.png", width = 300, height = 400)
 plt <- plot(density(totalAmount), main = "Distribucija atributa total_amount", xlab = "Ukupna cena", ylab = "Gustina", xlim = c(0, 300))
 dev.off()
 clearFn()
@@ -275,7 +275,7 @@ kable(tipStatusCounts)
 ```
 ```{r Vizuelizacija atributa tip_status, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 py <- pull(data, tip_status)
-png("images/tipStatusCounts.png", width = 800, height = 1200)
+png("images/tipStatusCounts.png", width = 300, height = 400)
 pi <- pie(table(py), main = "Broj vožnji po načinu plaćanja")
 dev.off()
 clearFn()
@@ -297,7 +297,7 @@ ptd <- data %>%
     select(passenger_count, trip_distance) %>%
     collect()
 
-png("images/passengerCountTripDistance.png", width = 800, height = 1200)
+png("images/passengerCountTripDistance.png", width = 300, height = 400)
 boxplot(trip_distance ~ passenger_count, data = ptd, main = "Dužina putovanja po broju putnika", xlab = "Broj putnika", ylab = "Dužina putovanja")
 dev.off()
 clearFn()
@@ -318,7 +318,7 @@ ppt <- data %>%
     select(passenger_count, payment_type) %>%
     collect()
 
-png("images/passengerCountPaymentType.png", width = 800, height = 1200)
+png("images/passengerCountPaymentType.png", width = 300, height = 400)
 mosaicplot(table(ppt), main = "Broj vožnji po broju putnika i payment_type-u", xlab = "Broj putnika", ylab = "payment_type", color = c("red", "blue", "green", "yellow", "purple", "orange"))
 dev.off()
 clearFn()
@@ -339,7 +339,7 @@ pfa <- data %>%
     select(passenger_count, fare_amount) %>%
     collect()
 
-png("images/passengerCountFareAmount.png", width = 800, height = 1200)
+png("images/passengerCountFareAmount.png", width = 300, height = 400)
 boxplot(fare_amount ~ passenger_count, data = pfa, main = "Cena vožnje po broju putnika", xlab = "Broj putnika", ylab = "Cena vožnje")
 dev.off()
 clearFn()
@@ -359,7 +359,7 @@ pta <- data %>%
     select(passenger_count, tip_amount) %>%
     collect()
 
-png("images/passengerCountTipAmount.png", width = 800, height = 1200)
+png("images/passengerCountTipAmount.png", width = 300, height = 400)
 boxplot(tip_amount ~ passenger_count, data = pta, main = "Napojnica po broju putnika", xlab = "Broj putnika", ylab = "Napojnica")
 dev.off()
 clearFn()
@@ -380,7 +380,7 @@ pta <- data %>%
     select(passenger_count, tolls_amount) %>%
     collect()
 
-png("images/passengerCountTollsAmount.png", width = 800, height = 1200)
+png("images/passengerCountTollsAmount.png", width = 300, height = 400)
 boxplot(tolls_amount ~ passenger_count, data = pta, main = "Troškovi putarine po broju putnika", xlab = "Broj putnika", ylab = "Troškovi putarine")
 dev.off()
 clearFn()
@@ -400,7 +400,7 @@ pta <- data %>%
     select(passenger_count, total_amount) %>%
     collect()
 
-png("images/passengerCountTotalAmount.png", width = 800, height = 1200)
+png("images/passengerCountTotalAmount.png", width = 300, height = 400)
 boxplot(total_amount ~ passenger_count, data = pta, main = "Ukupna cena po broju putnika", xlab = "Broj putnika", ylab = "Ukupna cena")
 dev.off()
 clearFn()
@@ -421,7 +421,7 @@ ppc <- data %>%
     select(passenger_count, tip_status) %>%
     collect()
 
-png("images/passengerCountTipStatus.png", width = 800, height = 1200)
+png("images/passengerCountTipStatus.png", width = 300, height = 400)
 mosaicplot(table(ppc), main = "Broj vožnji po broju putnika i načinu plaćanja", xlab = "Broj putnika", ylab = "tip_status", color = c("red", "blue"))
 dev.off()
 clearFn()
@@ -439,7 +439,7 @@ tp <- data %>%
     select(trip_distance, payment_type) %>%
     collect()
 
-png("images/tripDistancePaymentType.png", width = 800, height = 1200)
+png("images/tripDistancePaymentType.png", width = 300, height = 400)
 boxplot(trip_distance ~ payment_type, data = tp, main = "Dužina putovanja po payment_type-u", xlab = "payment_type", ylab = "Dužina putovanja")
 dev.off()
 ```
@@ -450,7 +450,7 @@ tfa <- data %>%
     select(trip_distance, fare_amount) %>%
     collect()
 
-png("images/tripDistanceFareAmount.png", width = 800, height = 1200)
+png("images/tripDistanceFareAmount.png", width = 300, height = 400)
 plot(tfa, main = "Dužina putovanja po ceni vožnje", xlab = "Dužina putovanja", ylab = "Cena vožnje")
 dev.off()
 clearFn()
@@ -463,7 +463,7 @@ tta <- data %>%
     select(trip_distance, tip_amount) %>%
     collect()
 
-png("images/tripDistanceTipAmount.png", width = 800, height = 1200)
+png("images/tripDistanceTipAmount.png", width = 300, height = 400)
 plot(tta, main = "Dužina putovanja po napojnici", xlab = "Dužina putovanja", ylab = "Napojnica")
 dev.off()
 clearFn()
@@ -476,7 +476,7 @@ tta <- data %>%
     select(trip_distance, tolls_amount) %>%
     collect()
 
-png("images/tripDistanceTollsAmount.png", width = 800, height = 1200)
+png("images/tripDistanceTollsAmount.png", width = 300, height = 400)
 plot(tta, main = "Dužina putovanja po troškovima putarine", xlab = "Dužina putovanja", ylab = "Troškovi putarine")
 dev.off()
 clearFn()
@@ -488,7 +488,7 @@ tta <- data %>%
     select(trip_distance, total_amount) %>%
     collect()
 
-png("images/tripDistanceTotalAmount.png", width = 800, height = 1200)
+png("images/tripDistanceTotalAmount.png", width = 300, height = 400)
 plot(tta, main = "Dužina putovanja po ukupnoj ceni", xlab = "Dužina putovanja", ylab = "Ukupna cena")
 dev.off()
 clearFn()
@@ -509,7 +509,7 @@ tpc <- data %>%
     select(trip_distance, tip_status) %>%
     collect()
 
-png("images/tripDistanceTipStatus.png", width = 800, height = 1200)
+png("images/tripDistanceTipStatus.png", width = 300, height = 400)
 boxplot(trip_distance ~ tip_status, data = tpc, main = "Dužina putovanja po načinu plaćanja", xlab = "Način plaćanja", ylab = "Dužina putovanja")
 dev.off()
 clearFn()
@@ -529,7 +529,7 @@ pfa <- data %>%
     select(payment_type, fare_amount) %>%
     collect()
 
-png("images/paymentTypeFareAmount.png", width = 800, height = 1200)
+png("images/paymentTypeFareAmount.png", width = 300, height = 400)
 boxplot(fare_amount ~ payment_type, data = pfa, main = "Cena vožnje po payment_type-u", xlab = "payment_type", ylab = "Cena vožnje")
 dev.off()
 clearFn()
@@ -549,7 +549,7 @@ pta <- data %>%
     select(payment_type, tip_amount) %>%
     collect()
 
-png("images/paymentTypeTipAmount.png", width = 800, height = 1200)
+png("images/paymentTypeTipAmount.png", width = 300, height = 400)
 boxplot(tip_amount ~ payment_type, data = pta, main = "Napojnica po payment_type-u", xlab = "payment_type", ylab = "Napojnica")
 dev.off()
 ```
@@ -568,7 +568,7 @@ pta <- data %>%
     select(payment_type, tolls_amount) %>%
     collect()
 
-png("images/paymentTypeTollsAmount.png", width = 800, height = 1200)
+png("images/paymentTypeTollsAmount.png", width = 300, height = 400)
 boxplot(tolls_amount ~ payment_type, data = pta, main = "Troškovi putarine po payment_type-u", xlab = "payment_type", ylab = "Troškovi putarine")
 dev.off()
 ```
@@ -587,7 +587,7 @@ pta <- data %>%
     select(payment_type, total_amount) %>%
     collect()
 
-png("images/paymentTypeTotalAmount.png", width = 800, height = 1200)
+png("images/paymentTypeTotalAmount.png", width = 300, height = 400)
 boxplot(total_amount ~ payment_type, data = pta, main = "Ukupna cena po payment_type-u", xlab = "payment_type", ylab = "Ukupna cena")
 dev.off()
 clearFn()
@@ -608,19 +608,20 @@ ppc <- data %>%
     select(payment_type, tip_status) %>%
     collect()
 
-png("images/paymentTypeTipStatus.png", width = 800, height = 1200)
+png("images/paymentTypeTipStatus.png", width = 300, height = 400)
 mosaicplot(table(ppc), main = "Broj vožnji po payment_type-u i načinu plaćanja", xlab = "payment_type", ylab = "tip_status", color = c("red", "blue"))
 dev.off()
 clearFn()
 ```
 ![Broj vožnji po payment_type-u i načinu plaćanja](images/paymentTypeTipStatus.png)
+
 ### Analiza zavisnosti atributa fare_amount i tip_amount
 ```{r Vizuelizacija zavisnosti atributa fare_amount i tip_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 fta <- data %>%
     select(fare_amount, tip_amount) %>%
     collect()
 
-png("images/fareAmountTipAmount.png", width = 800, height = 1200)
+png("images/fareAmountTipAmount.png", width = 300, height = 400)
 plot(tip_amount ~ fare_amount, data = fta, main = "Napojnica po ceni vožnje", xlab = "Cena vožnje", ylab = "Napojnica")
 dev.off()
 clearFn()
@@ -633,19 +634,20 @@ fta <- data %>%
     select(fare_amount, tolls_amount) %>%
     collect()
 
-png("images/fareAmountTollsAmount.png", width = 800, height = 1200)
+png("images/fareAmountTollsAmount.png", width = 300, height = 400)
 plot(tolls_amount ~ fare_amount, data = fta, main = "Troškovi putarine po ceni vožnje", xlab = "Cena vožnje", ylab = "Troškovi putarine")
 dev.off()
 clearFn()
 ```
 ![Troškovi putarine po ceni vožnje](images/fareAmountTollsAmount.png)
+
 ### Analiza zavisnosti atributa fare_amount i total_amount
 ```{r Vizuelizacija zavisnosti atributa fare_amount i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 fta <- data %>%
     select(fare_amount, total_amount) %>%
     collect()
 
-png("images/fareAmountTotalAmount.png", width = 800, height = 1200)
+png("images/fareAmountTotalAmount.png", width = 300, height = 400)
 plot(total_amount ~ fare_amount, data = fta, main = "Ukupna cena po ceni vožnje", xlab = "Cena vožnje", ylab = "Ukupna cena")
 dev.off()
 clearFn()
@@ -666,36 +668,39 @@ fpc <- data %>%
     select(fare_amount, tip_status) %>%
     collect()
 
-png("images/fareAmountTipStatus.png", width = 800, height = 1200)
+png("images/fareAmountTipStatus.png", width = 300, height = 400)
 mosaicplot(table(fpc), main = "Broj vožnji po ceni vožnje i načinu plaćanja", xlab = "fare_amount", ylab = "tip_status", color = c("red", "blue"))
 dev.off()
 clearFn()
 ```
 ![Broj vožnji po ceni vožnje i načinu plaćanja](images/fareAmountTipStatus.png)
+
 ### Analiza zavisnosti atributa tip_amount i tolls_amount
 ```{r Vizuelizacija zavisnosti atributa tip_amount i tolls_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tta <- data %>%
     select(tip_amount, tolls_amount) %>%
     collect()
 
-png("images/tipAmountTollsAmount.png", width = 800, height = 1200)
+png("images/tipAmountTollsAmount.png", width = 300, height = 400)
 plot(tolls_amount ~ tip_amount, data = tta, main = "Troškovi putarine po napojnici", xlab = "Napojnica", ylab = "Troškovi putarine")
 dev.off()
 clearFn()
 ```
 ![Troškovi putarine po napojnici](images/tipAmountTollsAmount.png)
+
 ### Analiza zavisnosti atributa tip_amount i total_amount
 ```{r Vizuelizacija zavisnosti atributa tip_amount i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tta <- data %>%
     select(tip_amount, total_amount) %>%
     collect()
 
-png("images/tipAmountTotalAmount.png", width = 800, height = 1200)
+png("images/tipAmountTotalAmount.png", width = 300, height = 400)
 plot(total_amount ~ tip_amount, data = tta, main = "Ukupna cena po napojnici", xlab = "Napojnica", ylab = "Ukupna cena")
 dev.off()
 clearFn()
 ```
 ![Ukupna cena po napojnici](images/tipAmountTotalAmount.png)
+
 ### Analiza zavisnosti atributa tip_amount i tip_status
 ```{r Analiza zavisnosti atributa tip_amount i tip_status, message=FALSE, warning=FALSE, error=FALSE}
 tipAmountTipStatus <- data %>%
@@ -710,19 +715,20 @@ tpc <- data %>%
     select(tip_amount, tip_status) %>%
     collect()
 
-png("images/tipAmountTipStatus.png", width = 800, height = 1200)
+png("images/tipAmountTipStatus.png", width = 300, height = 400)
 boxplot(tip_amount ~ tip_status, data = tpc, main = "Napojnica po načinu plaćanja", xlab = "Način plaćanja", ylab = "Napojnica")
 dev.off()
 clearFn()
 ```
 ![Napojnica po načinu plaćanja](images/tipAmountTipStatus.png)
+
 ### Analiza zavisnosti atributa tolls_amount i total_amount
 ```{r Vizuelizacija zavisnosti atributa tolls_amount i total_amount, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tta <- data %>%
     select(tolls_amount, total_amount) %>%
     collect()
 
-png("images/tollsAmountTotalAmount.png", width = 800, height = 1200)
+png("images/tollsAmountTotalAmount.png", width = 300, height = 400)
 plot(total_amount ~ tolls_amount, data = tta, main = "Ukupna cena po troškovima putarine", xlab = "Troškovi putarine", ylab = "Ukupna cena")
 dev.off()
 clearFn()
@@ -743,19 +749,20 @@ tpc <- data %>%
     select(tolls_amount, tip_status) %>%
     collect()
 
-png("images/tollsAmountTipStatus.png", width = 800, height = 1200)
+png("images/tollsAmountTipStatus.png", width = 300, height = 400)
 boxplot(tolls_amount ~ tip_status, data = tpc, main = "Troškovi putarine po načinu plaćanja", xlab = "Način plaćanja", ylab = "Troškovi putarine")
 dev.off()
 clearFn()
 ```
 ![Troškovi putarine po načinu plaćanja](images/tollsAmountTipStatus.png)
+
 ### Analiza zavisnosti atributa total_amount i tip_status
 ```{r Vizuelizacija zavisnosti atributa total_amount i tip_status, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 tpc <- data %>%
     select(total_amount, tip_status) %>%
     collect()
 
-png("images/totalAmountTipStatus.png", width = 800, height = 1200)
+png("images/totalAmountTipStatus.png", width = 300, height = 400)
 boxplot(total_amount ~ tip_status, data = tpc, main = "Ukupna cena po načinu plaćanja", xlab = "Način plaćanja", ylab = "Ukupna cena")
 dev.off()
 clearFn()
@@ -763,7 +770,7 @@ clearFn()
 ![Ukupna cena po načinu plaćanja](images/totalAmountTipStatus.png)
 
 ### Matrica korelacije
-```{r korelaciona-matrica-obelezja, eval=FALSE, include=TRUE}
+```{r korelaciona-matrica-obelezja, include=TRUE}
 local_df <- data %>% 
     select(-tip_status) %>%
   sdf_sample(fraction = 0.8, replacement = FALSE, seed=1) %>%
@@ -817,7 +824,7 @@ clearFn <- function() {
 ```
 ## Logistička regresija
 ### Obučavanje i evaluacija modela
-```{r Logistička regresija, message=FALSE, warning=FALSE, error=FALSE}
+```{r Logistička regresija, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 smp <- c(1:3)
 max.iter <- smp * 5
 
@@ -836,7 +843,7 @@ for(i in smp){
 }
 ```
 ### Prikaz zavisnosti
-```{r Prikaz zavisnosti 1, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Prikaz zavisnosti 1, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 logistic_metrics <- data.frame(i=max.iter, wp=log.precision, wr=log.recall, wf=log.fmeasure, acc=log.accuracy)
 
 p1 <- logistic_metrics %>%
@@ -877,7 +884,7 @@ ggsave("images/logAccIter.png", p4)
 ![Zavisnost tacnosti od maksimalnog broja iteracija](images/logAccIter.png)
 
 ### Validacija
-```{r Validacija 1, message=FALSE, warning=FALSE, error=FALSE}
+```{r Validacija 1, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pip <- sc %>% 
     ml_pipeline() %>%
     ft_r_formula(formula) %>%
@@ -900,6 +907,7 @@ ggsave("images/logKFolds.png", p)
 clearFn()
 ```
 ![K-folds validacija tacnost logisticka regresija](images/logKFolds.png)
+
 ### Odabir modela
 Model sa najviše iteracija pokazao je najbolje rezultate (najbolju preciznost, f1, tačnost, osetljivost) prilikom testiranja 
 i najbolju tačnost prilikom k-fold unakrsnog validiranja sa k=4.
@@ -907,7 +915,7 @@ Time, biramo model sa 15 iteracija.
 
 ## Stablo odlučivanja
 ### Obučavanje i evaluacija modela
-```{r Stablo odlučivanja, message=FALSE, warning=FALSE, error=FALSE}
+```{r Stablo odlučivanja, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 smp <- c(1:3)
 max.depth <- smp * 5
 
@@ -923,7 +931,7 @@ for(i in smp){
 }
 ```
 ### Prikaz zavisnosti
-```{r Prikaz zavisnosti 2, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Prikaz zavisnosti 2, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 decision_tree_metrics <- data.frame(i=max.depth, acc=dt.accuracy)
 
 p <- decision_tree_metrics %>%
@@ -936,8 +944,9 @@ p <- decision_tree_metrics %>%
 ggsave("images/dtAccDepth.png", p)
 ```
 ![Zavisnost preciznosti od maksimalne dubine](images/dtAccDepth.png)
+
 ### Validacija
-```{r Validacija 2, message=FALSE, warning=FALSE, error=FALSE}
+```{r Validacija 2, eval==FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pip <- sc %>% 
     ml_pipeline() %>%
     ft_r_formula(formula) %>%
@@ -960,6 +969,7 @@ ggsave("images/dtKFolds.png", p)
 clearFn()
 ```
 ![K-folds validacija tacnost stablo odlucivanja](images/dtKFolds.png)
+
 ### Odabir modela
 Model sa najvećom dubinom stabla pokazao je najbolje rezultate (najbolju preciznost, f1, tačnost, osetljivost) prilikom testiranja
 i najbolju tačnost prilikom k-fold unakrsnog validiranja sa k=4.
@@ -980,8 +990,9 @@ for(i in smp){
     rf.accuracy[i] <- eval$Accuracy
 }
 ```
+
 ### Prikaz zavisnosti
-```{r Prikaz zavisnosti 3, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Prikaz zavisnosti 3, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 random_forest_metrics <- data.frame(i=num.trees, acc=rf.accuracy)
 
 p <- random_forest_metrics %>%
@@ -996,7 +1007,7 @@ ggsave("images/rfAccTrees.png", p)
 ![Zavisnost tacnosti od broja stabala](images/rfAccTrees.png)
 
 ### Validacija
-```{r Validacija 3, message=FALSE, warning=FALSE, error=FALSE}
+```{r Validacija 3, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 pip <- sc %>% 
     ml_pipeline() %>%
     ft_r_formula(formula) %>%
@@ -1019,8 +1030,9 @@ ggsave("images/rfKFolds.png", p)
 clearFn()
 ```
 ![K-folds validacija tacnost random forest](images/rfKFolds.png)
+
 ### Odabir modela
-Model sa najmanjim brojem stabala pokazao je najbolje rezultate (najbolju preciznost, f1, tačnost, osetljivost) prilikom testiranja
+Model sa najmanjim brojem stabala pokazao je najbolje tačnost prilikom testiranja
 i najbolju tačnost prilikom k-fold unakrsnog validiranja sa k=4.
 Time, biramo model sa 5 stabala.
 
@@ -1031,6 +1043,7 @@ features <- standardized_data %>%
     select(total_amount, passenger_count, payment_type)
 formula <- ~ total_amount + passenger_count + payment_type
 ```
+
 ### Funkcija za čišćenje memorije
 ```{r Funkcija za čišćenje memorije 3, results='hide', message=FALSE, warning=FALSE, error=FALSE}
 clearFn <- function() {
@@ -1043,7 +1056,7 @@ clearFn <- function() {
 
 ## K-means
 ### Biranje K
-```{r Biranje K, message=FALSE, eval=FALSE, warning=FALSE, error=FALSE}
+```{r Biranje K, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 clustered <- list()
 for(k in 2:10) {
   clustered[[k]] <- features %>% ml_bisecting_kmeans(formula=formula, k = k, max_iter = 10)
@@ -1066,6 +1079,7 @@ ggsave("images/kElbowPlot.png", k_elbow_plot)
 clearFn()
 ```
 ![Suma gresaka](images/kElbowPlot.png)
+
 Pregledanjem grafika, velike promene se dešavaju na k=4 i k=7, čime su izabrane 
 za parametre.
 
@@ -1105,8 +1119,9 @@ kable(kmeans.medians[[2]], caption=paste0("K-means medijane sa k=", ks[[2]]))
 kable(kmeans.counts[[2]], caption=paste0("K-means broj sa k=", ks[[2]]))
 clearFn()
 ```
+
 ### Prikaz odnosa obeležja i pripadnosti klasterima
-```{r Prikaz klastera, include=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r Prikaz klastera, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 means <- data %>%
     summarise(total_amount=mean(total_amount)) %>%
     collect()
@@ -1117,17 +1132,17 @@ sds <- data %>%
 
 for(i in smp) {
     tmp <- kmeans_predictions[[i]] %>% select(payment_type, prediction) %>% collect()
-    png(paste0("images/kmeans_payment_type_", ks[[i]], ".png"), width = 800, height = 1200)
+    png(paste0("images/kmeans_payment_type_", ks[[i]], ".png"), width = 300, height = 400)
     boxplot(payment_type ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Dužina putovanja")
     dev.off()
 
     tmp <- kmeans_predictions[[i]] %>% select(total_amount, prediction) %>% mutate(total_amount = total_amount * sds$total_amount + means$total_amount ) %>% collect()
-    png(paste0("images/kmeans_total_amount_", ks[[i]], ".png"), width = 800, height = 1200)
+    png(paste0("images/kmeans_total_amount_", ks[[i]], ".png"), width = 300, height = 400)
     boxplot(total_amount ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Potpuna cena")
     dev.off()
 
     tmp <- kmeans_predictions[[i]] %>% select(passenger_count, prediction) %>% collect()
-    png(paste0("images/kmeans_passenger_count_", ks[[i]], ".png"), width = 800, height = 1200)
+    png(paste0("images/kmeans_passenger_count_", ks[[i]], ".png"), width = 300, height = 400)
     boxplot(passenger_count ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Napojnica")
     dev.off()
 }
