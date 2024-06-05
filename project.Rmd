@@ -800,7 +800,6 @@ for(i in smp){
 ### Prikaz zavisnosti
 ```{r Prikaz zavisnosti, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 logistic_metrics <- data.frame(i=max.iter, wp=log.precision, wr=log.recall, wf=log.fmeasure, acc=log.accuracy)
-plots <- list()
 
 p1 <- logistic_metrics %>%
 ggplot(aes(i, wp, color=wp)) +
@@ -863,6 +862,11 @@ ggsave("images/logKFolds.png", p)
 clearFn1()
 ```
 ![K-folds validacija tacnost logisticka regresija](images/logKFolds.png)
+### Odabir modela
+Model sa najviše iteracija pokazao je najbolje rezultate (najbolju preciznost, f1, tačnost, osetljivost) prilikom testiranja 
+i najbolju tačnost prilikom k-fold unakrsnog validiranja sa k=4.
+Time, biramo model sa 15 iteracija.
+
 ## Stablo odlučivanja
 ### Obučavanje i evaluacija modela
 ```{r Stablo odlučivanja, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
@@ -881,7 +885,6 @@ for(i in smp){
 ### Prikaz zavisnosti
 ```{r Prikaz zavisnosti, eval=FALSE, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 decision_tree_metrics <- data.frame(i=max.depth, acc=dt.accuracy)
-plots <- list()
 
 p <- decision_tree_metrics %>%
   ggplot(aes(i, acc, color=acc)) +
@@ -917,6 +920,11 @@ ggsave("images/dtKFolds.png", p)
 clearFn1()
 ```
 ![K-folds validacija tacnost stablo odlucivanja](images/dtKFolds.png)
+### Odabir modela
+Model sa najvećom dubinom stabla pokazao je najbolje rezultate (najbolju preciznost, f1, tačnost, osetljivost) prilikom testiranja
+i najbolju tačnost prilikom k-fold unakrsnog validiranja sa k=4.
+Time, biramo model sa maksimalnom dubinom stabla od 15.
+
 ## Random forest
 ### Obučavanje i evaluacija modela
 ```{r Random forest, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
@@ -935,7 +943,6 @@ for(i in smp){
 ### Prikaz zavisnosti
 ```{r Prikaz zavisnosti, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
 random_forest_metrics <- data.frame(i=num.trees, acc=rf.accuracy)
-plots <- list()
 
 p <- random_forest_metrics %>%
   ggplot(aes(i, acc, color=acc)) +
@@ -972,5 +979,10 @@ ggsave("images/rfKFolds.png", p)
 clearFn1()
 ```
 ![K-folds validacija tacnost random forest](images/rfKFolds.png)
+### Odabir modela
+Model sa najmanjim brojem stabala pokazao je najbolje rezultate (najbolju preciznost, f1, tačnost, osetljivost) prilikom testiranja
+i najbolju tačnost prilikom k-fold unakrsnog validiranja sa k=4.
+Time, biramo model sa 5 stabala.
 
-## Zaključak
+# Klasterizacija
+
