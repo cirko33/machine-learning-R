@@ -1094,11 +1094,11 @@ clearFn()
 ```
 ![Suma gresaka](images/kElbowPlot.png)
 
-Pregledanjem grafika, velike promene se dešavaju na k=4 i k=7, čime su izabrane 
+Pregledanjem grafika, velike promene se dešavaju na k=4 i k=6, čime su izabrane 
 za parametre.
 
 ### Obučavanje
-Za obučavanje su odabrani modeli sa k=4 i k=7.
+Za obučavanje su odabrani modeli sa k=4 i k=6.
 ```{r Obučavanje, message=FALSE, warning=FALSE, error=FALSE}
 kmeans_models <- list()
 kmeans_predictions <- list()
@@ -1113,8 +1113,8 @@ kmeans_models[[1]]
 kmeans_models[[2]]
 ```
 
-### Izračunavanje struktura klastera
-```{r Izračunavanje struktura klastera, message=FALSE, warning=FALSE, error=FALSE}
+### Izračunavanje vrednosti klastera
+```{r Izračunavanje vrednosti klastera, message=FALSE, warning=FALSE, error=FALSE}
 kmeans.means <- list()
 kmeans.medians <- list()
 kmeans.counts <- list()
@@ -1147,7 +1147,7 @@ sds <- data %>%
 for(i in smp) {
     tmp <- kmeans_predictions[[i]] %>% select(payment_type, prediction) %>% collect()
     png(paste0("images/kmeans_payment_type_", ks[[i]], ".png"), width = 300, height = 400)
-    boxplot(payment_type ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Dužina putovanja")
+    boxplot(payment_type ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Tip plaćanja")
     dev.off()
 
     tmp <- kmeans_predictions[[i]] %>% select(total_amount, prediction) %>% mutate(total_amount = total_amount * sds$total_amount + means$total_amount ) %>% collect()
@@ -1157,7 +1157,7 @@ for(i in smp) {
 
     tmp <- kmeans_predictions[[i]] %>% select(passenger_count, prediction) %>% collect()
     png(paste0("images/kmeans_passenger_count_", ks[[i]], ".png"), width = 300, height = 400)
-    boxplot(passenger_count ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Napojnica")
+    boxplot(passenger_count ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Broj putnika")
     dev.off()
 }
 
