@@ -918,7 +918,6 @@ p <- metrics %>%
   geom_line()
 
 ggsave("images/logKFolds.png", p)
-clearFn()
 ```
 ![K-folds validacija tacnost logisticka regresija](images/logKFolds.png)
 
@@ -980,7 +979,6 @@ p <- metrics %>%
   geom_line()
 
 ggsave("images/dtKFolds.png", p)
-clearFn()
 ```
 ![K-folds validacija tacnost stablo odlucivanja](images/dtKFolds.png)
 
@@ -1041,7 +1039,6 @@ p <- metrics %>%
   geom_line()
 
 ggsave("images/rfKFolds.png", p)
-clearFn()
 ```
 ![K-folds validacija tacnost random forest](images/rfKFolds.png)
 
@@ -1049,6 +1046,25 @@ clearFn()
 Model sa najmanjim brojem stabala pokazao je najbolje tačnost prilikom testiranja
 i najbolju tačnost prilikom k-fold unakrsnog validiranja sa k=4.
 Time, biramo model sa 5 stabala.
+
+## Odabir modela od svih
+```{r Odabir od svih, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+metrics <- data.frame(i=max.iter, lr=log.accuracy, dt=dt.accuracy, rf=rf.accuracy)
+
+p <- metrics %>% 
+    ggplot() +
+    geom_line(aes(x=i,y=lr), colour="blue") +
+    geom_line(aes(x=i,y=dt), colour="red") +
+    geom_line(aes(x=i,y=rf), colour="green")
+    
+
+ggsave("images/chosen.png", p)
+clearFn()
+```
+![Odabrani model](images/chosen.png)
+
+Odabran je model Stablo odlučivanja sa najvećom dubinom 15 zbog 
+najboljih performansi u vidu tačnosti.
 
 # Klasterizacija
 ## Priprema podataka
