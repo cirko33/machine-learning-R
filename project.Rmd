@@ -1053,8 +1053,21 @@ Time, biramo model sa 5 stabala.
 # Klasterizacija
 ## Priprema podataka
 ```{r Priprema podataka 2, message=FALSE, warning=FALSE, error=FALSE}
-features <- standardized_data %>%
-    select(total_amount, passenger_count, payment_type)
+means <- data %>%
+    summarise_all(mean) %>%
+    collect()
+
+sds <- data %>%
+    summarise_all(sd) %>%
+    collect()
+ 
+standardized_data <- data %>%
+    select(total_amount, passenger_count, payment_type) %>%
+    mutate(passenger_count = (passenger_count - means$passenger_count) / sds$passenger_count,
+           payment_type = (payment_type - means$payment_type) / sds$payment_type,
+           total_amount = (total_amount - means$total_amount) / sds$total_amount)
+
+features <- standardized_data
 formula <- ~ total_amount + passenger_count + payment_type
 ```
 
@@ -1062,7 +1075,7 @@ formula <- ~ total_amount + passenger_count + payment_type
 ```{r Funkcija za čišćenje memorije 3, results='hide', message=FALSE, warning=FALSE, error=FALSE}
 clearFn <- function() {
     all_objects <- ls()
-    needed_to_keep <- c("sc", "ds.df", "ds.filtered", "data", "conf", "clearFn", "features", "standardized_data")
+    needed_to_keep <- c("sc", "ds.df", "ds.filtered", "data", "conf", "clearFn", "features", "standardized_data", "sds", "means", "formula")
     to_remove <- setdiff(all_objects, needed_to_keep)
     rm(list = to_remove)
 }
@@ -1120,9 +1133,26 @@ kmeans.medians <- list()
 kmeans.counts <- list()
 
 for(i in smp) {
-    kmeans.means[[i]] <- kmeans_predictions[[i]] %>% select(-features, -payment_type) %>% group_by(prediction) %>% summarise_all(mean) %>% arrange(prediction) %>% collect()
-    kmeans.medians[[i]] <- kmeans_predictions[[i]] %>% select(-features, -payment_type) %>% group_by(prediction) %>% summarise_all(median) %>% arrange(prediction) %>% collect()
-    kmeans.counts[[i]] <- kmeans_predictions[[i]] %>% select(-features) %>% group_by(prediction) %>% summarise(count = n()) %>% arrange(prediction) %>% collect()
+    tmp <- kmeans_predictions[[i]] %>% select(-features, -payment_type) %>% mutate(total_amount = total_amount * sds$total_amount + means$total_amount,
+                  passenger_count = passenger_count * sds$passenger_count + means$passenger_count) 
+
+    kmeans.means[[i]] <- tmp %>%
+        group_by(prediction) %>% 
+        summarise_all(mean) %>% 
+        arrange(prediction) %>% 
+        collect()
+
+    kmeans.medians[[i]] <- tmp %>%
+        group_by(prediction) %>% 
+        summarise_all(median) %>% 
+        arrange(prediction) %>% 
+        collect()
+
+    kmeans.counts[[i]] <- tmp %>%
+        group_by(prediction) %>% 
+        summarise(count = n()) %>% 
+        arrange(prediction) %>% 
+        collect()
 }
 
 kable(kmeans.means[[1]], caption=paste0("K-means aritmeticke sredine sa k=", ks[[1]]))
@@ -1136,31 +1166,23 @@ clearFn()
 
 ### Prikaz odnosa obeležja i pripadnosti klasterima
 ```{r Prikaz klastera, include=FALSE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
-means <- data %>%
-    summarise(total_amount=mean(total_amount)) %>%
-    collect()
-
-sds <- data %>%
-    summarise(total_amount=sd(total_amount)) %>%
-    collect()
-
 for(i in smp) {
-    tmp <- kmeans_predictions[[i]] %>% select(payment_type, prediction) %>% collect()
+    tmp <- kmeans_predictions[[i]] %>% select(payment_type, prediction) %>% mutate(payment_type = payment_type * sds$payment_type + means$payment_type) %>% collect()
     png(paste0("images/kmeans_payment_type_", ks[[i]], ".png"), width = 300, height = 400)
     boxplot(payment_type ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Tip plaćanja")
     dev.off()
 
-    tmp <- kmeans_predictions[[i]] %>% select(total_amount, prediction) %>% mutate(total_amount = total_amount * sds$total_amount + means$total_amount ) %>% collect()
+    tmp <- kmeans_predictions[[i]] %>% select(total_amount, prediction) %>% mutate(total_amount = total_amount * sds$total_amount + means$total_amount) %>% collect()
     png(paste0("images/kmeans_total_amount_", ks[[i]], ".png"), width = 300, height = 400)
     boxplot(total_amount ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Potpuna cena")
     dev.off()
 
-    tmp <- kmeans_predictions[[i]] %>% select(passenger_count, prediction) %>% collect()
+    tmp <- kmeans_predictions[[i]] %>% select(passenger_count, prediction) %>% mutate(passenger_count = passenger_count * sds$passenger_count + means$passenger_count) %>% collect()
     png(paste0("images/kmeans_passenger_count_", ks[[i]], ".png"), width = 300, height = 400)
     boxplot(passenger_count ~ prediction, data = tmp, main = paste0("K-means klaster sa k=", ks[[i]]), xlab = "Klaster", ylab = "Broj putnika")
     dev.off()
 }
-
+clearFn()
 ```
 ![K-means klaster sa k=4 odnos payment_type i klastera](images/kmeans_payment_type_4.png)
 ![K-means klaster sa k=4 odnos total_amount i klastera](images/kmeans_total_amount_4.png)
@@ -1169,3 +1191,8 @@ for(i in smp) {
 ![K-means klaster sa k=6 odnos total_amount i klastera](images/kmeans_total_amount_6.png)
 ![K-means klaster sa k=6 odnos passenger_count i klastera](images/kmeans_passenger_count_6.png)
 
+# Otkačivanje sa Spark sesije
+```{r Otkačivanje, message=FALSE, warning=FALSE, error=FALSE}
+spark_disconnect(sc)
+rm(list = ls())
+```
